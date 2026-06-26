@@ -1,8 +1,8 @@
 # Telecom Network Supervision Platform
 
-> منصة إشراف شبكي ذكية تعتمد على الذكاء الاصطناعي لمراقبة وتأمين البنية التحتية للاتصالات
+> منصة إشراف شبكي لمراقبة وتأمين البنية التحتية للاتصالات
 
-An AI-powered network supervision platform for monitoring, analyzing, and securing telecom infrastructure in real time. Built as a PFE (Projet de Fin d'Etudes) project using a **three-layer architecture**.
+An Anetwork supervision platform for monitoring, analyzing, and securing telecom infrastructure in real time. Built as a PFE (Projet de Fin d'Etudes) project using a **three-layer architecture**.
 
 ---
 

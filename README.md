@@ -81,7 +81,7 @@ cp src/main/resources/application.properties.example src/main/resources/applicat
 ./mvnw spring-boot:run
 ```
 
-### 3. AI Module (Flask)
+### 3. ML Module (Flask)
 
 ```bash
 cd ai-module/
@@ -130,7 +130,7 @@ The ContainerLab topology consists of 14 nodes across 4 network zones:
 - **LAN Zone** (10.0.2.0/24): FTP server, DB server, PCs
 - **Management Zone** (10.0.4.0/24): Supervision stack (web, app, db, ai)
 
-## AI Models
+## Machine Models
 
 - **XGBoost**: Supervised classification of network anomalies
 - **Isolation Forest**: Unsupervised anomaly detection

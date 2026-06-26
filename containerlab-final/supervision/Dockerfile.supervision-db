@@ -1,0 +1,36 @@
+FROM mysql:8.0
+
+
+ENV MYSQL_ROOT_PASSWORD=
+ENV MYSQL_ALLOW_EMPTY_PASSWORD=yes
+ENV MYSQL_DATABASE=telecom_db
+
+
+RUN microdnf install -y openssh-server openssh-clients iproute procps-ng \
+    && microdnf clean all
+
+
+RUN ssh-keygen -A && \
+    mkdir -p /var/run/sshd && \
+    echo 'root:toor' | chpasswd
+
+RUN printf 'Port 22\n\
+PermitRootLogin yes\n\
+PasswordAuthentication yes\n\
+MaxAuthTries 5\n\
+LogLevel VERBOSE\n' > /etc/ssh/sshd_config
+
+
+RUN echo "[mysqld]" > /etc/my.cnf.d/network.cnf && \
+    echo "bind-address = 0.0.0.0" >> /etc/my.cnf.d/network.cnf && \
+    echo "skip-name-resolve" >> /etc/my.cnf.d/network.cnf && \
+    echo "max_connections = 200" >> /etc/my.cnf.d/network.cnf
+
+
+RUN mkdir -p /docker-entrypoint-initdb.d && \
+    echo "CREATE DATABASE IF NOT EXISTS telecom_db;" > /docker-entrypoint-initdb.d/00-init.sql && \
+    echo "CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED WITH mysql_native_password BY '';" >> /docker-entrypoint-initdb.d/00-init.sql && \
+    echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;" >> /docker-entrypoint-initdb.d/00-init.sql && \
+    echo "FLUSH PRIVILEGES;" >> /docker-entrypoint-initdb.d/00-init.sql
+
+EXPOSE 22 3306

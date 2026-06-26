@@ -1,0 +1,52 @@
+FROM alpine:latest
+
+# ── Packages: nginx + ssh + tools ────────────────────────────
+RUN apk add --no-cache \
+    python3 py3-pip \
+    nginx \
+    openssh \
+    openrc \
+    iproute2 \
+    iputils \
+    curl \
+    bash \
+    syslog-ng \
+    iptables 
+
+
+RUN pip3 install psutil requests --break-system-packages
+
+
+RUN ssh-keygen -A && \
+    mkdir -p /var/run/sshd && \
+    echo 'root:toor' | chpasswd
+
+RUN printf 'Port 22\n\
+PermitRootLogin yes\n\
+PasswordAuthentication yes\n\
+PubkeyAuthentication yes\n\
+MaxAuthTries 5\n\
+MaxStartups 100:30:200\n\
+LoginGraceTime 60\n\
+LogLevel VERBOSE\n\
+SyslogFacility AUTH\n' > /etc/ssh/sshd_config
+
+
+RUN mkdir -p /var/www/html /run/nginx
+RUN printf '<!DOCTYPE html>\n<html>\n<head><title>Telecom Web Server</title></head>\n<body>\n  <h1>Telecom Web Server</h1>\n  <p>Status: Online | IP: 10.0.1.2</p>\n</body>\n</html>\n' \
+    > /var/www/html/index.html
+RUN printf '<!DOCTYPE html>\n<html>\n<head><title>About</title></head>\n<body>\n  <h1>About</h1>\n  <p>Telecom Network Monitoring System</p>\n</body>\n</html>\n' \
+    > /var/www/html/about.html
+
+
+RUN printf 'worker_processes 1;\n\nevents {\n    worker_connections 2048;\n}\n\nhttp {\n    client_header_timeout 300s;\n    client_body_timeout   300s;\n    keepalive_timeout     300s;\n    send_timeout          300s;\n\n    server {\n        listen 80;\n        server_name _;\n        root /var/www/html;\n        index index.html;\n        location / { try_files $uri $uri/ =404; }\n        access_log /var/log/nginx/access.log;\n        error_log  /var/log/nginx/error.log;\n    }\n}\n' \
+    > /etc/nginx/nginx.conf
+
+
+RUN printf '@version: 4.0\n\
+source s_local { system(); internal(); };\n\
+destination d_auth { file("/var/log/messages" flush_lines(0)); };\n\
+log { source(s_local); destination(d_auth); };\n' > /etc/syslog-ng/syslog-ng.conf
+
+EXPOSE 22 80
+

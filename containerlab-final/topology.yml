@@ -1,0 +1,201 @@
+name: telecom-supervision
+
+
+topology:
+  nodes:
+
+
+
+    edge-router:
+      kind: linux
+      image: telecom-router:latest
+      cpu: 1.0
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-edge-router.sh
+
+    core-router:
+      kind: linux
+      image: telecom-router:latest
+      cpu: 1.0
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-core-router.sh
+
+
+    web-server:
+      kind: linux
+      image: telecom-web:latest
+      cpu: 0.5
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-web.sh
+
+    dns-server:
+      kind: linux
+      image: telecom-dns:latest
+      cpu: 0.3
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-dns.sh
+
+
+    ftp-server:
+      kind: linux
+      image: telecom-ftp:latest
+      cpu: 0.3
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-ftp.sh
+
+    db-server:
+      kind: linux
+      image: telecom-db:latest
+      cpu: 0.5
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-db.sh
+
+    pc1:
+      kind: linux
+      image: telecom-client:latest
+      cpu: 0.3
+      memory: 256m
+      env:
+        PC_NAME: pc1
+        PC_IP: 10.0.2.4
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-pc.sh
+
+    pc2:
+      kind: linux
+      image: telecom-client:latest
+      cpu: 0.3
+      memory: 256m
+      env:
+        PC_NAME: pc2
+        PC_IP: 10.0.2.5
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-pc.sh
+
+
+    supervision-web:
+      kind: linux
+      image: telecom-supervision-web:latest
+      cpu: 0.5
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-supervision-web.sh
+
+    supervision-app:
+      kind: linux
+      image: telecom-supervision-app:latest
+      cpu: 1.0
+      memory: 1536m
+      binds:
+        - ./scripts:/scripts
+        - /var/run/docker.sock:/var/run/docker.sock
+      exec:
+        - sh /scripts/init/init-supervision-app.sh
+
+    supervision-ai:
+      kind: linux
+      image: telecom-supervision-ai:latest
+      cpu: 1.0
+      memory: 1024m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - bash /scripts/init/init-supervision-ai.sh
+
+    supervision-db:
+      kind: linux
+      image: telecom-supervision-db:latest
+      cpu: 0.5
+      memory: 768m
+      binds:
+        - ./scripts:/scripts
+        - mysql-data:/var/lib/mysql  # persistence
+      env:
+        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+        MYSQL_DATABASE: telecom_db
+      exec:
+        - bash /scripts/init/init-supervision-db.sh
+
+
+    attacker:
+      kind: linux
+      image: telecom-attacker:latest
+      memory: 1024m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-attacker.sh
+
+    ext-client1:
+      kind: linux
+      image: telecom-client:latest
+      cpu: 0.3
+      memory: 256m
+      env:
+        CLIENT_IP: 10.0.0.20
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-ext-client.sh
+
+    ext-client2:
+      kind: linux
+      image: telecom-client:latest
+      cpu: 0.3
+      memory: 256m
+      env:
+        CLIENT_IP: 10.0.0.30
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/init/init-ext-client.sh
+
+
+
+  links:
+
+    - endpoints: ["attacker:eth1",      "edge-router:eth1"]
+    - endpoints: ["ext-client1:eth1",   "edge-router:eth3"]
+    - endpoints: ["ext-client2:eth1",   "edge-router:eth4"]
+
+
+    - endpoints: ["edge-router:eth2",   "core-router:eth1"]
+
+
+    - endpoints: ["core-router:eth2",   "web-server:eth1"]
+    - endpoints: ["core-router:eth3",   "dns-server:eth1"]
+
+
+    - endpoints: ["core-router:eth4",   "ftp-server:eth1"]
+    - endpoints: ["core-router:eth5",   "db-server:eth1"]
+    - endpoints: ["core-router:eth6",   "pc1:eth1"]
+    - endpoints: ["core-router:eth7",   "pc2:eth1"]
+
+    - endpoints: ["core-router:eth8",   "supervision-web:eth1"]
+    - endpoints: ["core-router:eth9",   "supervision-app:eth1"]
+    - endpoints: ["core-router:eth10",  "supervision-ai:eth1"]
+    - endpoints: ["core-router:eth11",  "supervision-db:eth1"]

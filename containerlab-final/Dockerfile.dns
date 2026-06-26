@@ -1,0 +1,58 @@
+FROM alpine:latest
+
+
+RUN apk add --no-cache \
+    python3 py3-pip \
+    bind \
+    openssh \
+    iproute2 \
+    iputils \
+    bash \
+    syslog-ng \
+    iptables
+
+
+RUN pip3 install psutil requests --break-system-packages
+
+
+RUN ssh-keygen -A && \
+    mkdir -p /var/run/sshd && \
+    echo 'root:toor' | chpasswd
+
+RUN printf 'Port 22\n\
+PermitRootLogin yes\n\
+PasswordAuthentication yes\n\
+PubkeyAuthentication yes\n\
+MaxAuthTries 5\n\
+LogLevel VERBOSE\n' > /etc/ssh/sshd_config
+
+
+RUN mkdir -p /etc/bind /var/cache/bind /var/run/named
+
+RUN printf 'options {\n\
+    directory "/var/cache/bind";\n\
+    listen-on { any; };\n\
+    allow-query { any; };\n\
+    recursion yes;\n\
+    forwarders { 8.8.8.8; 1.1.1.1; };\n\
+    dnssec-validation no;\n\
+};\n\
+zone "telecom.local" IN {\n\
+    type master;\n\
+    file "/etc/bind/telecom.local.zone";\n\
+};\n' > /etc/bind/named.conf
+
+RUN printf '$TTL 86400\n\
+@ IN SOA ns1.telecom.local. admin.telecom.local. (\n\
+    2024010101 3600 1800 604800 86400 )\n\
+@ IN NS ns1.telecom.local.\n\
+ns1 IN A 10.0.1.3\n\
+web IN A 10.0.1.2\n\
+db  IN A 10.0.2.3\n\
+ftp IN A 10.0.2.2\n\
+supervision IN A 10.0.4.10\n\
+api IN A 10.0.4.11\n' > /etc/bind/telecom.local.zone
+
+RUN chown -R named:named /var/cache/bind /var/run/named /etc/bind 2>/dev/null || true
+
+EXPOSE 22 53/tcp 53/udp

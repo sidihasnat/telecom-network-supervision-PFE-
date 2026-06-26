@@ -1,0 +1,216 @@
+name: telecom-supervision
+
+
+topology:
+  nodes:
+
+    edge-router:
+      kind: linux
+      image: telecom-router:latest
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - syslog-ng
+        # WAN-EXT bridge (eth1=attacker, eth3=ext-client1, eth4=ext-client2)
+        - ip link add br-wan type bridge
+        - ip link set eth1 master br-wan
+        - ip link set eth3 master br-wan
+        - ip link set eth4 master br-wan
+        - ip link set br-wan up
+        - ip addr add 10.0.0.1/24 dev br-wan
+        # WAN-INT interface
+        - ip addr add 10.0.3.1/24 dev eth2
+        - sysctl -w net.ipv4.ip_forward=1
+        - ip route del default
+        # Backend route (Spring Boot Windows)
+        - ip route add 172.27.0.0/16 via 172.20.20.1 dev eth0
+        - ip route add default via 172.20.20.1 dev eth0
+        # Route إلى DMZ و LAN عبر core-router
+        - ip route add 10.0.1.0/24 via 10.0.3.2 dev eth2
+        - ip route add 10.0.2.0/24 via 10.0.3.2 dev eth2
+#       - iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+#        - iptables -A FORWARD -d 10.0.2.0/24 -m state --state NEW -j DROP
+        - sh /scripts/set-dns.sh
+        - python3 /scripts/metrics.py edge-router router 10.0.0.10 10.0.3.2 &
+
+    core-router:
+      kind: linux
+      image: telecom-router:latest
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        # WAN-INT interface
+        - syslog-ng
+        - ip addr add 10.0.3.2/24 dev eth1
+
+        # DMZ bridge (eth2=web, eth3=dns)
+        - ip link add br-dmz type bridge
+        - ip link set eth2 master br-dmz
+        - ip link set eth3 master br-dmz
+        - ip link set br-dmz up
+        - ip addr add 10.0.1.1/24 dev br-dmz
+
+        # LAN bridge (eth4=ssh, eth5=db, eth6=pc1, eth7=pc2)
+        - ip link add br-lan type bridge
+        - ip link set eth4 master br-lan
+        - ip link set eth5 master br-lan
+        - ip link set eth6 master br-lan
+        - ip link set eth7 master br-lan
+        - ip link set br-lan up
+        - ip addr add 10.0.2.1/24 dev br-lan
+
+        # Routing
+        - sysctl -w net.ipv4.ip_forward=1
+        - ip route del default
+        # Backend route
+        - ip route add 172.27.0.0/16 via 172.20.20.1 dev eth0
+        - ip route add default via 10.0.3.1 dev eth1
+        # Route a WAN-EXT => edge-router
+        - ip route add 10.0.0.0/24 via 10.0.3.1 dev eth1
+        - sh /scripts/set-dns.sh
+        - python3 /scripts/metrics.py core-router router 10.0.3.1 10.0.1.2 10.0.2.3 &
+
+    web-server:
+      kind: linux
+      image: telecom-web:latest
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/set-dns.sh
+        - sh /scripts/start-web.sh &
+
+    dns-server:
+      kind: linux
+      image: telecom-dns:latest
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/set-dns-local.sh
+        - sh /scripts/start-dns.sh &
+
+    ssh-server:
+      kind: linux
+      image: telecom-ssh:latest
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/set-dns.sh
+        - sh /scripts/start-ssh.sh &
+
+    db-server:
+      kind: linux
+      image: telecom-db:latest
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - sh /scripts/set-dns.sh
+        - sh /scripts/start-db.sh &
+
+    pc1:
+      kind: linux
+      image: telecom-client:latest
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - syslog-ng
+        - ip addr add 10.0.2.4/24 dev eth1
+        - ip route del default
+        # ── Backend route ──
+        - ip route add 172.27.0.0/16 via 172.20.20.1 dev eth0
+        - ip route add default via 10.0.2.1 dev eth1
+        - sh /scripts/set-dns.sh
+        - sh /scripts/background_traffic.sh &
+        - python3 /scripts/metrics.py pc1 client 10.0.2.1
+
+    pc2:
+      kind: linux
+      image: telecom-client:latest
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - syslog-ng
+        - ip addr add 10.0.2.5/24 dev eth1
+        - ip route del default
+        # ── Backend route ──
+        - ip route add 172.27.0.0/16 via 172.20.20.1 dev eth0
+        - ip route add default via 10.0.2.1 dev eth1
+        - sh /scripts/set-dns.sh
+        - sh /scripts/background_traffic.sh &
+        - python3 /scripts/metrics.py pc2 client 10.0.2.1 &
+
+    attacker:
+      kind: linux
+      image: telecom-attacker:latest
+      memory: 512m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - ip addr add 10.0.0.10/24 dev eth1
+        - ip route del default
+        - ip route add default via 10.0.0.1 dev eth1
+        # Attacker يصل لكل الشبكات عبر edge-router
+        - ip route add 10.0.1.0/24 via 10.0.0.1 dev eth1
+        - ip route add 10.0.2.0/24 via 10.0.0.1 dev eth1
+        - ip route add 10.0.3.0/24 via 10.0.0.1 dev eth1
+        - ip route add 172.27.0.0/16 via 172.20.20.1 dev eth0
+        - sh /scripts/set-dns.sh
+        - sh /scripts/background_traffic.sh &
+
+
+    ext-client1:
+      kind: linux
+      image: telecom-client:latest
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - syslog-ng
+        - ip addr add 10.0.0.20/24 dev eth1
+        - ip route del default
+        - ip route add default via 10.0.0.1 dev eth1
+        - ip route add 10.0.1.0/24 via 10.0.0.1 dev eth1
+        - ip route add 10.0.2.0/24 via 10.0.0.1 dev eth1
+        - ip route add 10.0.3.0/24 via 10.0.0.1 dev eth1
+        - sh /scripts/set-dns.sh
+        - sh /scripts/background_traffic.sh &
+
+    ext-client2:
+      kind: linux
+      image: telecom-client:latest
+      memory: 256m
+      binds:
+        - ./scripts:/scripts
+      exec:
+        - syslog-ng
+        - ip addr add 10.0.0.30/24 dev eth1
+        - ip route del default
+        - ip route add default via 10.0.0.1 dev eth1
+        - ip route add 10.0.1.0/24 via 10.0.0.1 dev eth1
+        - ip route add 10.0.2.0/24 via 10.0.0.1 dev eth1
+        - ip route add 10.0.3.0/24 via 10.0.0.1 dev eth1
+        - sh /scripts/set-dns.sh
+        - sh /scripts/background_traffic.sh &
+
+  links:
+    # WAN-EXT (attacker + ext-clients ↔ edge-router)
+    - endpoints: ["attacker:eth1",      "edge-router:eth1"]
+    - endpoints: ["ext-client1:eth1",   "edge-router:eth3"]
+    - endpoints: ["ext-client2:eth1",   "edge-router:eth4"]
+    # WAN-INT (edge-router ↔ core-router)
+    - endpoints: ["edge-router:eth2",   "core-router:eth1"]
+    # DMZ (br-dmz)
+    - endpoints: ["core-router:eth2",   "web-server:eth1"]
+    - endpoints: ["core-router:eth3",   "dns-server:eth1"]
+    # LAN (br-lan)
+    - endpoints: ["core-router:eth4",   "ssh-server:eth1"]
+    - endpoints: ["core-router:eth5",   "db-server:eth1"]
+    - endpoints: ["core-router:eth6",   "pc1:eth1"]
+    - endpoints: ["core-router:eth7",   "pc2:eth1"]

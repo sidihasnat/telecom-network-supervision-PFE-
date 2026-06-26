@@ -1,0 +1,44 @@
+FROM python:3.11-slim
+
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssh-server \
+    iproute2 \
+    iputils-ping \
+    bash \
+    rsyslog \
+    curl \
+    netcat-openbsd \
+    && rm -rf /var/lib/apt/lists/*
+
+
+RUN mkdir -p /var/run/sshd && \
+    echo 'root:toor' | chpasswd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    flask==3.0.0 \
+    flask-cors==4.0.0 \
+    pandas==2.1.4 \
+    numpy==1.26.2 \
+    scikit-learn==1.3.2 \
+    xgboost==2.0.3 \
+    joblib==1.3.2 \
+    requests==2.31.0 \
+    psutil==5.9.6
+
+
+COPY flask-ai/ /app/
+
+
+RUN if [ -f /app/requirements.txt ]; then \
+        pip install --no-cache-dir -r /app/requirements.txt 2>/dev/null || true; \
+    fi
+
+EXPOSE 22 5000
+
+CMD ["sh", "-c", "tail -f /dev/null"]

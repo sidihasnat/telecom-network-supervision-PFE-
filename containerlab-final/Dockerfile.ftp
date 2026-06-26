@@ -1,0 +1,80 @@
+FROM alpine:latest
+
+
+RUN apk add --no-cache \
+    python3 py3-pip \
+    vsftpd \
+    openssh \
+    iproute2 \
+    iputils \
+    bash \
+    syslog-ng \
+    util-linux-login \
+    iptables \
+    shadow
+
+
+RUN pip3 install psutil requests --break-system-packages
+
+
+RUN ssh-keygen -A && \
+    mkdir -p /var/run/sshd && \
+    echo 'root:toor' | chpasswd
+
+RUN printf 'Port 22\n\
+PermitRootLogin yes\n\
+PasswordAuthentication yes\n\
+PubkeyAuthentication yes\n\
+MaxAuthTries 5\n\
+MaxStartups 100:30:200\n\
+LoginGraceTime 60\n\
+LogLevel VERBOSE\n\
+SyslogFacility AUTH\n' > /etc/ssh/sshd_config
+
+
+
+
+
+RUN printf 'listen=YES\n\
+listen_ipv6=NO\n\
+anonymous_enable=NO\n\
+local_enable=YES\n\
+write_enable=YES\n\
+local_umask=022\n\
+dirmessage_enable=YES\n\
+use_localtime=YES\n\
+xferlog_enable=YES\n\
+xferlog_std_format=YES\n\
+xferlog_file=/var/log/vsftpd.log\n\
+log_ftp_protocol=YES\n\
+dual_log_enable=YES\n\
+vsftpd_log_file=/var/log/vsftpd.log\n\
+connect_from_port_20=YES\n\
+chroot_local_user=YES\n\
+allow_writeable_chroot=YES\n\
+seccomp_sandbox=NO\n\
+pasv_enable=YES\n\
+pasv_min_port=21100\n\
+pasv_max_port=21110\n\
+pam_service_name=vsftpd\n\
+ssl_enable=NO\n' > /etc/vsftpd/vsftpd.conf
+
+
+RUN adduser -D -h /home/ftpuser ftpuser && \
+    echo 'ftpuser:ftppass' | chpasswd && \
+    mkdir -p /home/ftpuser/files && \
+    echo 'Welcome to Telecom FTP Server' > /home/ftpuser/files/welcome.txt && \
+    chown -R ftpuser:ftpuser /home/ftpuser
+
+
+RUN touch /var/log/vsftpd.log && \
+    chmod 644 /var/log/vsftpd.log && \
+    touch /var/log/btmp
+
+
+RUN printf '@version: 4.0\n\
+source s_local { system(); internal(); };\n\
+destination d_auth { file("/var/log/messages" flush_lines(0)); };\n\
+log { source(s_local); destination(d_auth); };\n' > /etc/syslog-ng/syslog-ng.conf
+
+EXPOSE 21 22 21100-21110

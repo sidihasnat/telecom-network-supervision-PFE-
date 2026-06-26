@@ -1,0 +1,52 @@
+FROM alpine:latest
+
+
+RUN apk add --no-cache \
+    python3 py3-pip \
+    mariadb mariadb-client \
+    openssh \
+    iproute2 \
+    iputils \
+    bash \
+    syslog-ng \
+    iptables
+
+
+RUN pip3 install psutil requests --break-system-packages
+
+
+RUN ssh-keygen -A && \
+    mkdir -p /var/run/sshd && \
+    echo 'root:toor' | chpasswd
+
+RUN printf 'Port 22\n\
+PermitRootLogin yes\n\
+PasswordAuthentication yes\n\
+PubkeyAuthentication yes\n\
+MaxAuthTries 5\n\
+LogLevel VERBOSE\n' > /etc/ssh/sshd_config
+
+
+RUN mkdir -p /var/lib/mysql /run/mysqld /etc/mysql
+
+RUN printf '[mysqld]\n\
+bind-address = 0.0.0.0\n\
+port = 3306\n\
+datadir = /var/lib/mysql\n\
+skip-name-resolve\n\
+max_connections = 200\n\
+[client]\n\
+port = 3306\n' > /etc/mysql/my.cnf
+
+
+RUN mysql_install_db --user=mysql --datadir=/var/lib/mysql --skip-test-db 2>/dev/null || true
+RUN chown -R mysql:mysql /var/lib/mysql /run/mysqld 2>/dev/null || true
+
+
+RUN mysqld --user=mysql --skip-grant-tables --skip-networking & \
+    sleep 3 && \
+    mysql -u root -e "CREATE DATABASE telecom; USE telecom; CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50), email VARCHAR(100)); INSERT INTO users VALUES (1,'admin','admin@telecom.local'),(2,'user1','user1@telecom.local');" && \
+    pkill mysqld || true
+
+EXPOSE 22 3306
+

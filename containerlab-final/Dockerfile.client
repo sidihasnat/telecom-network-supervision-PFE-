@@ -1,0 +1,40 @@
+FROM alpine:latest
+
+
+RUN apk add --no-cache \
+    python3 py3-pip \
+    openssh \
+    iproute2 \
+    iputils \
+    curl wget \
+    nmap \
+    mariadb-client \
+    bash \
+    syslog-ng \
+    coreutils
+
+
+RUN pip3 install psutil requests --break-system-packages
+
+
+RUN ssh-keygen -A && \
+    mkdir -p /var/run/sshd && \
+    echo 'root:toor' | chpasswd
+
+RUN printf 'Port 22\n\
+PermitRootLogin yes\n\
+PasswordAuthentication yes\n\
+PubkeyAuthentication yes\n\
+MaxAuthTries 5\n\
+MaxStartups 100:30:200\n\
+LoginGraceTime 60\n\
+LogLevel VERBOSE\n\
+SyslogFacility AUTH\n' > /etc/ssh/sshd_config
+
+
+RUN printf '@version: 4.0\n\
+source s_local { system(); internal(); };\n\
+destination d_auth { file("/var/log/messages" flush_lines(0)); };\n\
+log { source(s_local); destination(d_auth); };\n' > /etc/syslog-ng/syslog-ng.conf
+
+EXPOSE 22

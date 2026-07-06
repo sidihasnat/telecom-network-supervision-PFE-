@@ -1,0 +1,47 @@
+name: telecom_ai_mobile
+description: TelecomAI - Network Supervision & Threat Detection Mobile App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management + DI + Routing (نفس المشروع القديم)
+  get: ^4.6.6
+  get_storage: ^2.1.1
+
+  # HTTP Client
+  http: ^1.2.1
+
+  # WebSocket (STOMP over SockJS) — للـ /topic/metrics, /topic/predictions, etc
+  stomp_dart_client: ^2.0.0
+
+  # Charts (المستخدم في Monitoring + DeviceDetail History/KPI)
+  fl_chart: ^0.69.0
+
+  # Date formatting
+  intl: ^0.19.0
+
+  # Zoom Drawer (شكل الـ Drawer من المشروع القديم)
+  flutter_zoom_drawer: ^3.2.0
+
+  flutter_local_notifications: ^17.2.3
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.png"
+
+flutter:
+  uses-material-design: true

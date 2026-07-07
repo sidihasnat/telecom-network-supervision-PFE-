@@ -1,0 +1,789 @@
+
+% !TEX program = xelatex
+\documentclass[12pt,a4paper]{report}
+\usepackage[a4paper,left=1.9cm,right=1.9cm,top=2.25cm,bottom=2.3cm]{geometry}
+\usepackage{fontspec}
+\setmainfont{TeXGyreTermes}
+\setsansfont{TeXGyreHeros}
+\setmonofont{TeXGyreCursor}
+\usepackage{polyglossia}
+\setmainlanguage{french}
+\setotherlanguage{arabic}
+\newfontfamily\arabicfont[Script=Arabic,Scale=1.15]{Amiri}
+\usepackage{graphicx,float,caption,booktabs,longtable,array,tabularx,colortbl,enumitem,xcolor,setspace,titlesec,fancyhdr,needspace,hyperref}
+\usepackage[normalem]{ulem}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black}
+\setstretch{1.22}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.18em}
+\sloppy
+\titleformat{\chapter}[display]{\normalfont\bfseries\centering\Huge}{\chaptername\ \thechapter}{0.5em}{}
+\titlespacing*{\chapter}{0pt}{-1.0cm}{0.45cm}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\setlength{\headheight}{14.5pt}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\nouppercase{\leftmark}}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0.4pt}
+\newcommand{\pfeimage}[2][]{\begin{figure}[H]\centering\includegraphics[width=0.90\textwidth,height=0.72\textheight,keepaspectratio,#1]{#2}\end{figure}}
+\newcommand{\pfelogo}[2][0.45\textwidth]{\begin{figure}[H]\centering\includegraphics[width=#1]{#2}\end{figure}}
+
+\newcommand{\tocrow}[2]{#1 \dotfill & #2\\}
+\newcommand{\yes}{\textcolor{green!50!black}{\textbf{Oui}}}
+\newcommand{\pfenon}{\textcolor{red!75!black}{\textbf{Non}}}
+\newcommand{\ub}[1]{\uline{\textbf{#1}}}
+
+\begin{document}
+
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{center}
+\includegraphics[width=0.20\textwidth]{images/fig_p01_001.png}\\[0.7cm]
+
+Université de Nouakchott\par
+Faculté des Sciences et Techniques\par
+Département d'Informatique\par
+\vspace{1.6cm}
+{\Large\bfseries MÉMOIRE DE FIN D'ÉTUDES\par}
+\vspace{0.25cm}
+Pour l'obtention du diplôme de Licence en\par
+Développement et Administration de l'Internet et de l'Intranet\par
+\vspace{0.7cm}
+\rule{0.78\textwidth}{0.4pt}\par
+\vspace{0.35cm}
+{\large Sujet\par}
+\vspace{0.35cm}
+{\Large\bfseries Mise en place d'une plateforme de supervision avec accès\\
+Web et Mobile pour une infrastructure de\\
+Télécommunication\par}
+\vspace{1.3cm}
+\begin{tabular}{rl}
+\textbf{Présenté Par :} & Sidi Mohamed Lemin Ahmed El Hanoun C23803\\[0.25cm]
+\ub{Encadré Par :} & \\[0.1cm]
+\textbf{Académique :} & Ahmed Mohamed Lemin Mamoune\\
+\textbf{Professionnel :} & Mohamed Khlil\\
+\end{tabular}
+\vfill
+{\bfseries Effectué au sein de Mauritel\par}
+\vspace{1.4cm}
+{\bfseries Année Universitaire 2025 -- 2026\par}
+\end{center}
+\end{titlepage}
+\setlength{\parskip}{0.68\baselineskip}
+\pagenumbering{roman}
+\clearpage
+\section*{\ub{Remerciements}}
+\addcontentsline{toc}{section}{Remerciements}
+Au terme de ce travail, je tiens à remercier toutes les personnes qui ont contribué, de près ou de loin, à la réalisation de ce projet de fin d'études. Je remercie tout d'abord mon encadrant à la Faculté des Sciences et Techniques Pr Ahmed Mohamed Lemine Mamoune pour son suivi, ses conseils et sa disponibilité durant ce travail. Son accompagnement m'a beaucoup aidé tout au long du projet. J'adresse également mes remerciements au département DSI de Mauritel pour l'accueil et les bonnes conditions de travail durant ce stage. Je remercie plus particulièrement Pr Mohamed Khlil et Yahya Med Lemin pour leur encadrement, leurs conseils et le partage de leur expérience. Je remercie aussi mon frère Hasnat pour son aide et ses conseils, notamment lors de la rédaction du rapport. Enfin, je remercie ma famille pour son soutien et ses encouragements tout au long de mon parcours universitaire. À toutes et à tous, merci.\par
+
+\clearpage
+\section*{\ub{Résumé}}
+\addcontentsline{toc}{section}{Résumé}
+Ce projet de fin d'études porte sur la réalisation d'une plateforme de supervision réseau pour un opérateur de télécommunications. L'objectif est d'assurer une supervision en temps réel des équipements tout en permettant à l'opérateur de rester informé et réactif, même en situation de mobilité. La plateforme combine un tableau de bord web et une application mobile native avec des notifications push, déployés dans une infrastructure basée sur des conteneurs Docker. Elle intègre également deux modules complémentaires : la détection automatique d'attaques basée sur l'apprentissage automatique (Machine Learning) et une réponse automatisée à des incidents de sécurité. Les résultats obtenus montrent que la solution répond aux objectifs fixés.
+
+\textbf{Mots-clés :} supervision réseau, temps réel, application mobile, Spring Boot, React, Flutter, Docker, apprentissage automatique.
+
+\vspace{0.55cm}
+\section*{\ub{Abstract}}
+\addcontentsline{toc}{section}{Abstract}
+This graduation project focuses on the implementation of a network monitoring platform for a telecommunications operator. The objective is to provide real-time monitoring of network equipment while allowing the operator to remain informed and responsive, even in mobility situations. The platform combines a web dashboard and a native mobile application with push notifications, deployed using a Docker-based container infrastructure. It also includes two complementary modules: automatic attack detection based on Machine Learning and an automated response mechanism. The results show that the solution meets the defined objectives.
+
+\textbf{Keywords:} network monitoring, real-time, mobile application, Spring Boot, React, Flutter, Docker, Machine Learning.
+
+\vspace{0.45cm}
+\begin{Arabic}
+\noindent\underline{\textbf{ملخّص}}\par
+\noindent يتناول مشروع نهاية الدراسة هذا إنجاز منصّة لمراقبة الشبكة لفائدة مشغّل اتصاالت. الهدف هو ضمان مراقبة آنية للمعدّات، مع إبقاء المُشرف على اطّلاع وقادر على التفاعل، حتى أثناء تنقّله. تجمع المنصّة بين لوحة تحكّم ويب وتطبيق هاتف أصلي مع إشعارات فورية، منشورة على بنية تحتية قائمة على الحاويات. كما تتضمّن وحدتين تكميليّتين: الكشف التلقائي عن الهجمات والاستجابة الآلية. تُظهر النتائج أن الحلّ يحقّق أهدافه.\par
+\end{Arabic}
+\clearpage
+
+\section*{Table des matières}
+\addcontentsline{toc}{section}{Table des matières}
+\begingroup\small\setlength{\tabcolsep}{0pt}\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{@{}p{0.90\linewidth}@{\hspace{0.5cm}}r@{}}
+\tocrow{Remerciements}{i}
+\tocrow{Résumé}{ii}
+\tocrow{Table des matières}{iii}
+\tocrow{Liste des figures}{vi}
+\tocrow{Liste des tableaux}{vii}
+\tocrow{Liste des abréviations}{viii}
+\tocrow{Introduction Générale}{1}
+\tocrow{Contexte général :}{1}
+\tocrow{Cadre du stage :}{1}
+\tocrow{Présentation du Moov-Mauritel}{1}
+\tocrow{Problématique :}{2}
+\tocrow{Solution proposée :}{3}
+\tocrow{Méthodologie :}{3}
+\tocrow{Plan du mémoire :}{4}
+\tocrow{CHAPITRE 1 : Analyse des besoins}{5}
+\tocrow{1.1. Introduction :}{5}
+\tocrow{1.2. Identification des acteurs :}{5}
+\tocrow{1.2.1. Acteurs humains :}{5}
+\tocrow{1.2.2. Acteurs techniques :}{5}
+\tocrow{1.3. Besoins fonctionnels :}{6}
+\tocrow{1.4. Besoins non fonctionnels :}{8}
+\tocrow{1.5. Diagramme de cas d'utilisation :}{9}
+\tocrow{1.6. Comparaison Web et Mobile :}{9}
+\tocrow{CHAPITRE 2 : CONCEPTION}{11}
+\tocrow{2.1. Architecture globale :}{11}
+\tocrow{2.1.1. Vue d'ensemble :}{11}
+\tocrow{2.1.2. Les trois couches :}{12}
+\tocrow{2.1.3. Communication entre couches :}{13}
+\tocrow{2.1.4. Choix techniques structurants :}{13}
+\tocrow{2.2. Topologie réseau :}{13}
+\tocrow{2.2.1. Présentation générale :}{13}
+\tocrow{2.2.2. Les quatre zones :}{15}
+\tocrow{2.2.3. Plan d'adressage IP :}{16}
+\tocrow{2.2.4. Règles de filtrage et flux autorisés :}{16}
+\tocrow{2.2.5. Justification du choix de Containerlab :}{18}
+\tocrow{2.3. Conception de la base de données et diagramme de classes :}{19}
+\tocrow{2.3.1. Vue d'ensemble :}{19}
+\tocrow{2.3.2. Conventions techniques :}{19}
+\tocrow{2.4. Diagrammes de séquence :}{20}
+\tocrow{2.4.1. Détection d’une attaque par le module de machine learning :}{20}
+\tocrow{2.4.2. Surveillance de l’état des équipements :}{21}
+\tocrow{2.4.3. Authentification par JWT :}{22}
+\tocrow{2.5. Conception du module de machine learning :}{23}
+\tocrow{2.5.1. Approche générale :}{23}
+\tocrow{2.5.2 Deux modèles complémentaires :}{23}
+\tocrow{2.5.3 Détection par interface réseau :}{23}
+\tocrow{2.5.4 Sliding window pour réduire les faux positifs :}{23}
+\tocrow{2.5.5 Choix du dataset :}{23}
+\tocrow{2.6 Conception du module de réponse automatisée :}{24}
+\tocrow{2.6.1 Principe :}{24}
+\tocrow{2.6.2 Structure d’un playbook :}{24}
+\tocrow{2.6.3 Périmètre :}{24}
+\tocrow{CHAPITRE 3 : TECHNOLOGIES UTILISÉES}{25}
+\tocrow{3.1 Introduction :}{25}
+\tocrow{3.2 Infrastructure :}{25}
+\tocrow{3.2.1 Containerlab :}{25}
+\tocrow{3.2.2 Docker :}{26}
+\tocrow{3.3 Backend (Spring Boot et son écosystème) :}{26}
+\tocrow{3.3.1 Java et Spring Boot :}{26}
+\tocrow{3.3.2 Spring Security et JWT :}{27}
+\tocrow{3.4 \ub{Module de machine learning :}}{28}
+\tocrow{3.4.1 Python et Flask :}{28}
+\tocrow{3.4.2 XGBoost :}{28}
+\tocrow{3.4.3 Isolation Forest :}{29}
+\tocrow{3.4.4 scikit-learn, pandas et NumPy :}{29}
+\tocrow{3.5 Base de données :}{30}
+\tocrow{3.5.1 MySQL :}{30}
+\tocrow{3.6 Tableau de bord Web :}{30}
+\tocrow{3.6.1 React :}{30}
+\tocrow{3.6.2 Nginx :}{31}
+\tocrow{3.7 Application mobile :}{32}
+\tocrow{3.7.1 Flutter :}{32}
+\tocrow{3.8 Outils de développement :}{32}
+\tocrow{3.8.1 IDEs et éditeurs de code :}{32}
+\tocrow{3.8.2 Postman :}{33}
+\tocrow{3.8.3 Lucidchart :}{33}
+\tocrow{3.8.4 Jupyter Notebook :}{34}
+\tocrow{CHAPITRE 4 : RÉALISATION ET RÉSULTATS}{35}
+\tocrow{4.1. Mise en place de l'environnement :}{35}
+\tocrow{4.2 Dataset et modèles d'intelligence artificielle :}{35}
+\tocrow{4.2.1 Génération du dataset :}{35}
+\tocrow{4.2.2 Préparation du dataset avec Jupyter :}{36}
+\tocrow{4.2.3 Entraînement des modèles et résultats :}{37}
+\tocrow{4.3 Tableau de bord Web :}{37}
+\tocrow{4.3.1 Authentification :}{37}
+\tocrow{4.3.2 Mise en page et page d'accueil :}{38}
+\tocrow{4.3.3 Surveillance :}{39}
+\tocrow{4.3.4 \textbf{Sécurité :}}{40}
+\tocrow{4.3.5 Panneau latéral d'un équipement :}{41}
+\tocrow{4.3.6 Terminal :}{42}
+\tocrow{4.3.7 Paramètres :}{43}
+\tocrow{4.4 Scénarios d’incidents détectés :}{44}
+\tocrow{4.4.1 Déclenchement d’une Trigger Rule :}{44}
+\tocrow{4.4.2 Équipement hors ligne / Interface inactive :}{44}
+\tocrow{4.4.3 Attaque détectée par module de machine learning :}{44}
+\tocrow{4.4.4 Panneau de détail d’une attaque :}{45}
+\tocrow{4.5 Application mobile :}{45}
+\tocrow{4.5.1 Authentification :}{46}
+\tocrow{CONCLUSION GÉNÉRALE :}{53}
+\tocrow{ANNEXE : MOI NUMÉRIQUE ET VALORISATION PROFESSIONNELLE}{54}
+\tocrow{1. Profil LinkedIn :}{54}
+\tocrow{2. Profil GitHub:}{54}
+\tocrow{3. Profil Hugging face :}{54}
+\tocrow{4. Auto-formations:}{54}
+\tocrow{Références Bibliographiques:}{55}
+\end{longtable}
+\endgroup
+\clearpage
+\section*{Liste des figures}
+\addcontentsline{toc}{section}{Liste des figures}
+\begingroup\small\setlength{\tabcolsep}{0pt}\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{@{}p{0.90\linewidth}@{\hspace{0.5cm}}r@{}}
+\tocrow{Figure 1 : Diagramme de cas d'utilisation du système}{9}
+\tocrow{Figure 2 : Architecture globale}{11}
+\tocrow{Figure 3 : Topologie réseau}{14}
+\tocrow{Figure 4 : Diagramme de classes}{19}
+\tocrow{Figure 5 : Diagramme de séquence : cycle de supervision}{20}
+\tocrow{Figure 6 : Diagramme de séquence : surveillance de l'état des équipements}{21}
+\tocrow{Figure 7 : Diagramme de séquence : authentification par JWT}{22}
+\tocrow{Figure 8 : Déploiement du topologie réseau avec Containerlab}{35}
+\tocrow{Figure 9 : Notebook Jupyter : aperçu du dataset}{36}
+\tocrow{Figure 10 : Distribution finale des classes du dataset}{36}
+\tocrow{Figure 11 : Page de connexion de la table de bord}{37}
+\tocrow{Figure 12 : Vue d'ensemble de la table de bord (sidebar, header et accueil)}{38}
+\tocrow{Figure 13 : Page SLA}{39}
+\tocrow{Figure 14 : Page de surveillance}{39}
+\tocrow{Figure 15 : Page de sécurité}{40}
+\tocrow{Figure 16 : Onglet historique d'incident}{40}
+\tocrow{Figure 17 : Onglet Journal d’activité}{41}
+\tocrow{Figure 18 : Panneau latéral d'un équipement : onglet Vue d’ensemble et KPI}{41}
+\tocrow{Figure 19 : Panneau latéral d'un équipement : Historique et propriété}{42}
+\tocrow{Figure 20 : Page de console terminal distant}{42}
+\tocrow{Figure 21 : Page de paramètre (modèle ML, playbook)}{43}
+\tocrow{Figure 22 : Page de paramètre (règle de seuil et utilisateur ...)}{43}
+\tocrow{Figure 23 : Déclenchement d’une Trigger Rule}{44}
+\tocrow{Figure 24 : Équipement hors ligne / Interface inactive}{44}
+\tocrow{Figure 25 : Attaque détectée par module de machine learning}{44}
+\tocrow{Figure 26 : Panneau de détail d’un incident}{45}
+\tocrow{Figure 27 : Page de connexion de l'application mobile}{46}
+\tocrow{Figure 28 : Page de surveillance de l'application mobile}{47}
+\tocrow{Figure 29 : Menu latéral dans l'application mobile}{48}
+\tocrow{Figure 30 : Page de surveillance dans l'application mobile}{49}
+\tocrow{Figure 31 : Page de sécurité dans mobile}{50}
+\tocrow{Figure 32 : Panneau latéral d'un équipement dans mobile}{51}
+\end{longtable}
+\endgroup
+\clearpage
+\section*{Liste des tableaux}
+\addcontentsline{toc}{section}{Liste des tableaux}
+\begingroup\small\setlength{\tabcolsep}{0pt}\renewcommand{\arraystretch}{1.08}
+\begin{longtable}{@{}p{0.90\linewidth}@{\hspace{0.5cm}}r@{}}
+\tocrow{Tableau 1 : Comparaison des infrastructure Web et Mobile}{10}
+\tocrow{Tableau 2 : Plan d'adressage IP}{16}
+\tocrow{Tableau 3 : Règle de filtrage entre les zones}{17}
+\tocrow{Tableau 4 : Ports et protocoles utilisés}{18}
+\end{longtable}
+\endgroup
+\clearpage
+
+\section*{\ub{Liste des abréviations}}
+\addcontentsline{toc}{section}{Liste des abréviations}
+\begin{center}
+\begingroup\small\renewcommand{\arraystretch}{1.25}\setlength{\tabcolsep}{10pt}
+\begin{tabular}{@{}p{3.0cm}p{10.5cm}@{}}
+\textbf{API} & Application Programming Interface\\
+\textbf{ARP} & Address Resolution Protocol\\
+\textbf{CPU} & Central Processing Unit\\
+\textbf{DMZ} & Demilitarized Zone (zone démilitarisée)\\
+\textbf{DNS} & Domain Name System\\
+\textbf{FTP} & File Transfer Protocol\\
+\textbf{HTTP} & HyperText Transfer Protocol\\
+\textbf{HTTPS} & HyperText Transfer Protocol Secure\\
+\textbf{IP} & Internet Protocol\\
+\textbf{JWT} & JSON Web Token\\
+\textbf{KPI} & Key Performance Indicator\\
+\textbf{LAN} & Local Area Network\\
+\textbf{ML} & Machine Learning\\
+\textbf{REST} & Representational State Transfer\\
+\textbf{SLA} & Service Level Agreement\\
+\textbf{SOAR} & Security Orchestration, Automation and Response\\
+\textbf{SQL} & Structured Query Language\\
+\textbf{SSH} & Secure Shell\\
+\textbf{STOMP} & Simple Text Oriented Messaging Protocol\\
+\textbf{TCP} & Transmission Control Protocol\\
+\textbf{UDP} & User Datagram Protocol\\
+\textbf{UML} & Unified Modeling Language\\
+\textbf{WAN} & Wide Area Network\\
+\textbf{YAML} & YAML Ain't Markup Language\\
+\end{tabular}
+\endgroup
+\end{center}
+\clearpage
+\pagenumbering{arabic}
+\section*{\ub{Introduction Générale}}
+\addcontentsline{toc}{section}{Introduction Générale}
+\textbf{Contexte général :}\par
+Les opérateurs de télécommunications doivent assurer le bon fonctionnement de leurs infrastructures en continu afin de garantir l’accès aux services réseau et internet. Une panne ou un dysfonctionnement peut rapidement avoir un impact sur un grand nombre d’utilisateurs. Selon une étude menée par le Ponemon Institute, le coût moyen d'une panne réseau pour une entreprise de télécommunications peut atteindre 5 600 dollars par minute, ce qui souligne l'importance d'une surveillance proactive des infrastructures [1]. Dans cet environnement, la supervision réseau est une activité essentielle. Elle consiste à surveiller en continu l'état des équipements (routeurs, serveurs, services applicatifs), à détecter rapidement les anomalies, et à réagir avant que les problèmes n'affectent les utilisateurs finaux. Une supervision efficace contribue également à l’anticipation des pannes grâce à l’identification précoce des signes de défaillance et à la conservation d’un historique des événements pour faciliter l’analyse des incidents. Mauritel, principal opérateur de télécommunications en Mauritanie, possède une infrastructure composé de sereveurs,d’equipements et une partie de ces services est hébergée sur des serveurs Linux et déployée sous forme de conteneurs Docker. C'est dans ce contexte que s'inscrit ce projet de fin d'études\par
+\textbf{Cadre du stage :}\par
+Ce projet de fin d’études a été réalisé dans le cadre d’un stage de 3 mois au sein de Mauritel, du 01/03/2026 au 01/06/2026, dans le Département système d’informations. Le stage a été encadré par Mohamed Khlil côté entreprise et par Ahmed Mohamed Lemine Mamoune côté Faculté des Sciences et Techniques. L’objectif du stage était de concevoir et de développer une plateforme de supervision adaptée à une infrastructure réseau de télécommunication. Le projet vise à assurer une surveillance en temps réel des équipements et des services, à détecter rapidement les incidents et les anomalies, ainsi qu’à permettre un accès à distance aux informations de supervision à travers une interface web et une application mobile.\par
+\textbf{Présentation du Moov-Mauritel}\par
+\clearpage
+\textbf{Historique :}\par
+\pfeimage{images/fig_p11_002.png}
+La Société Mauritanienne des Télécommunications (Moov Mauritel) a été créée en vertu du décret n° 99-157/PM/MIPT du 29 décembre 1999 portant scission de l’Office des Postes et Télécommunications (OPT) en deux sociétés nationales. Ce texte est lui-même consécutif à la loi n° 99-019 du 11/07/1999 portant sur les télécommunications.\par
+\textbf{Statut de Moov Mauritel :} Moov Mauritel est une entreprise dynamique tournée vers l’avenir qui, depuis sa création, joue un rôle important dans le développement économique et social de la Mauritanie. Héritière de l’activité télécom de l’opérateur historique OPT, elle est un opérateur global (mobile, fixe et Internet). Elle a noué en avril 2001 un partenariat stratégique avec Maroc Telecom, ce qui en a fait un acteur majeur des télécommunications en Mauritanie, tous services confondus : mobile, Internet et fixe. Le réseau Eljawal de Mauritel Mobile a été inauguré par Monsieur Dah Ould Abdeljalil, ancien ministre de l’Intérieur, des Postes et Télécommunications, le samedi 18 novembre 2000. En 2020, Moov Mauritel a lancé la 4G à Nouakchott, devenant ainsi le premier opérateur en Mauritanie à s’engager résolument dans l’ère de l’Internet à très haut débit. À compter du 1er janvier 2021, Mauritel continue d’exister sous la marque « Moov Mauritel », un nouveau branding qui incarne son appartenance au groupe Maroc Telecom et adopte la signature de l’opérateur mondial : « A New World Calls You », promesse d’un monde de créativité illimitée et en constante évolution.\par
+\Needspace{4.5cm}
+\begin{figure}[H]
+\centering
+\textbf{L’Organigramme Général de L’entreprise :}\par
+\vspace{0.18cm}
+\includegraphics[width=0.92\textwidth,height=0.24\textheight,keepaspectratio]{images/fig_p12_003.png}
+\end{figure}
+\clearpage
+\textbf{Problématique :}\par
+Pour un opérateur de télécommunications comme Mauritel, garantir la disponibilité et la continuité des services réseau constitue une exigence permanente. Cela nécessite une supervision continue de l’infrastructure afin de surveiller l’état des équipements en temps réel, détecter rapidement les anomalies et intervenir avant que les utilisateurs ne soient affectés. Cependant, cette supervision reste souvent réalisée à partir d’un poste de travail. Les outils de monitoring sont généralement consultés depuis un ordinateur au sein du siège central de l’entreprise, alors qu’un incident peut survenir à tout moment : la nuit, pendant un déplacement ou en dehors des heures de bureau. Dans ce type de situation, l’opérateur dispose de moins de visibilité sur l’état du réseau, alors même que la rapidité de réaction devient essentielle.\par
+La question centrale de ce projet peut donc se formuler ainsi : Comment assurer une supervision en temps réel de l’état et des performances d’une infrastructure réseau, tout en permettant aux administrateurs de rester informés et réactifs aux incidents, même en situation de mobilité ? Afin de répondre à cette problématique : Ce projet vise à mettre en place une plateforme de supervision capable de surveiller l’infrastructure réseau en temps réel et de fournir un accès distant aux informations de supervision grâce à une interface web et une application mobile\par
+\textbf{Solution proposée :}\par
+Pour répondre à cette problématique, nous avons conçu une plateforme de supervision réseau accessible à la fois depuis un tableau de bord web et une application mobile. L’objectif est de permettre à l’opérateur de suivre l’état de l’infrastructure en temps réel, aussi bien depuis son poste de travail qu’en déplacement. La plateforme repose sur un système de collecte de métriques installé sur les équipements supervisés. Les informations système et réseau (CPU, mémoire, débit, connexions, latence, etc.) sont envoyées régulièrement vers la plateforme puis affichées sous forme de graphiques et de tableaux. Le système peut également détecter certains incidents comme un équipement hors ligne, une interface indisponible ou un dépassement de seuil défini par l’administrateur. L’application mobile constitue une partie importante du projet. Elle permet à l’opérateur de consulter l’état du réseau et de recevoir des notifications instantanées lorsqu’un incident est détecté. L’objectif est de garder une visibilité sur l’infrastructure même en dehors du poste de travail. La plateforme intègre aussi deux modules complémentaires : un module de machine learning pour détecter certaines attaques réseau, et un module de réponse automatisée permettant d’exécuter des actions prédéfinies en cas d’incident. Ces fonctionnalités seront détaillées dans les chapitres suivants.\par
+\textbf{Méthodologie :}\par
+Le projet a été réalisé suivant une démarche progressive organisée en plusieurs étapes. Une première phase a permis d’analyser les besoins et de définir les objectifs du projet. Ensuite, nous avons conçu l’architecture du système, la topologie réseau et les différents composants de la plateforme. La phase suivante a concerné le développement du backend, du tableau de bord web, de l’application mobile et des modules complémentaires. Enfin, plusieurs scénarios de test ont été réalisés afin de vérifier le bon fonctionnement du système. Le développement s’est appuyé sur plusieurs outils : IntelliJ IDEA et PyCharm pour le développement Java et Python, Visual Studio Code pour le frontend et les fichiers de configuration, Android Studio pour l’application mobile, Docker Desktop pour la conteneurisation, ainsi que Postman pour les tests des API.\par
+\textbf{Plan du mémoire :}\par
+Ce mémoire est organisé en quatre chapitres. Le chapitre 1 présente l’analyse des besoins du système, les différents acteurs ainsi que les besoins fonctionnels et non fonctionnels. Il introduit également les principaux cas d’utilisation. Le chapitre 2 est consacré à la conception de la plateforme : architecture générale, topologie réseau, modèle de données et conception des différents modules. Le chapitre 3 présente les technologies utilisées pour chaque partie du système, en justifiant les choix techniques. Le chapitre 4 décrit la réalisation concrète : la mise en place de l'environnement, la présentation des interfaces web et mobile à travers des captures d'écran commentées, et la démonstration du comportement du système face à plusieurs scénarios d'incidents. Enfin, une conclusion générale résume le travail réalisé et présente quelques perspectives d’amélioration.\par
+\clearpage
+\chapter*{\ub{CHAPITRE 1 : Analyse des besoins}}
+\addcontentsline{toc}{chapter}{CHAPITRE 1 : Analyse des besoins}
+\subsection*{1.1. Introduction :}
+L'analyse des besoins est la première étape concrète de tout projet logiciel. Elle permet de fixer ce que le système doit faire, qui va l'utiliser, et dans quelles conditions. Une analyse bien menée évite beaucoup de problèmes plus tard, lors de la conception et de l'implémentation. Dans ce chapitre, nous présentons d’abord les différents acteurs qui interagissent avec le système. Ensuite, nous décrivons les besoins fonctionnels et les besoins non fonctionnels. Nous présentons aussi le diagramme de cas d’utilisation, un tableau comparatif des fonctionnalités disponibles sur les interfaces Web et Mobile, ainsi que la description de deux cas d’utilisation importants.\par
+\subsection*{1.2. Identification des acteurs :}
+En UML, un acteur représente toute entité externe qui interagit avec le système en échangeant des informations ou en déclenchant des actions [2]. Il peut s’agir d’un utilisateur, d’un autre logiciel ou d’un équipement. Dans ce projet, nous avons identifié quatre acteurs principaux, répartis en deux catégories : les acteurs humains et les acteurs techniques.\par
+\subsection*{1.2.1. Acteurs humains :}
+\ub{Administrateur :}\par
+L’administrateur possède un accès complet au système. Il peut configurer les règles d’alerte, créer et modifier les playbooks de réponse, gérer les utilisateurs et exécuter des commandes à distance sur les équipements via SSH, soit manuellement depuis la console intégrée, soit automatiquement au moyen des playbooks.. Il assure le bon fonctionnement et la maintenance de la plateforme.\par
+\ub{Analyste (Viewer) :} L’analyste dispose d’un accès en lecture seule. Il consulte les tableaux de bord, surveille les alertes en cours, analyse les attaques détectées et reçoit les notifications. Il ne peut pas modifier la configuration ni exécuter des commandes. Ce rôle correspond aux opérateurs de supervision de premier niveau.\par
+\subsection*{1.2.2. Acteurs techniques :}
+\ub{Agent de métriques :}\par
+Il s’agit d’un script Python nommé metrics.py, installé sur toutes les machines Linux supervisées, y compris les routeurs. Toutes les dix secondes, il collecte plusieurs informations système et réseau comme l’utilisation  du CPU, la mémoire, les statistiques TCP/UDP, la table ARP et d’autres indicateurs importants, puis les envoie vers le backend. Cet agent joue un rôle essentiel, car sans ces métriques, aucune détection ne peut être réalisée.\par
+\ub{Module de machine learning :}\par
+C’est un service Python séparé, basé sur Flask, qui contient les deux modèles de machine learning : un classifieur XGBoost et un détecteur d’anomalies Isolation Forest. Il récupère régulièrement les nouvelles métriques depuis le backend via des requêtes HTTP REST, applique les modèles, et renvoie ses prédictions.\par
+\subsection*{1.3. Besoins fonctionnels :}
+Les besoins fonctionnels décrivent les principales fonctionnalités que le système doit fournir. Afin de faciliter la lecture, ils sont organisés en plusieurs catégories.\par
+\ub{BF1 - Supervision en temps réel :}\par
+La plateforme reçoit les métriques collectées par les agents de supervision toutes les 10 secondes (valeur par défaut). Ces données sont stockées puis affichées en temps réel dans l’interface. L’utilisateur peut consulter l’état actuel ainsi que l’historique sur une période choisie.\par
+\ub{BF2 - Accès multi-plateforme (web et mobile) :}\par
+La plateforme est accessible depuis un tableau de bord web et une application mobile. Le dashboard web permet la supervision complète du réseau ainsi que la configuration du système. L’application mobile permet surtout de consulter l’état des équipements, les métriques et les incidents en temps réel. Les deux interfaces utilisent les mêmes données fournies par le backend.\par
+\ub{BF3 - Gestion des incidents :}\par
+Le système regroupe les différents événements sous forme d’incidents : équipement hors ligne, interface inactive, dépassement de seuil ou attaque détectée par le module de machine learning. Chaque incident contient les principales informations utiles comme l’équipement concerné, la date, le type d’événement et, dans le cas d’une attaque, le niveau de confiance. L’utilisateur peut consulter les incidents actifs ainsi que l’historique.\par
+\ub{BF4 - Détection automatique d'attaques :}\par
+Le système analyse les métriques reçues à l’aide de modèles de machine learning afin de détecter les attaques connues (DDoS, SYN flood, port scan, brute force…) ainsi que les comportements anormaux.\par
+\ub{BF5 - Réponse automatisée :}\par
+Le système peut exécuter automatiquement un playbook lorsqu’un incident est détecté. Un playbook correspond à une suite de commandes shell définies par l’administrateur. Il peut appliquer des règles iptables, modifier certains paramètres système ou lancer des actions correctives via SSH. Lorsque l’adresse IP source est identifiable, comme dans certains cas de force brute ou de scan de ports, le système peut la transmettre au playbook afin de bloquer automatiquement l’adresse concernée.\par
+\ub{BF6 - Gestion des règles d'alerte :}\par
+En plus des alertes basées sur l’IA, l’administrateur peut définir ses propres règles à partir de seuils, comme : alerter si le CPU dépasse 90 \%. Ces règles sont évaluées à chaque nouvelle métrique reçue.\par
+\ub{BF7 - Accès distant aux équipements :}\par
+L’administrateur peut exécuter des commandes shell sur les équipements depuis une console SSH intégrée dans l’interface web. Il peut également administrer les conteneurs Docker hébergeant les différents services de la plateforme en les démarrant, les arrêtant ou les redémarrant.\par
+\ub{BF8 - Notifications et rapports :}\par
+Le système envoie des notifications via plusieurs canaux : notifications dans l’application web, notifications push sur mobile même lorsque l’application n’est pas au premier plan, ainsi que des rapports périodiques par courriel.\par
+\ub{BF9 - Administration et sécurité :} Le système utilise une authentification sécurisée basée sur JWT et un contrôle d’accès par rôles (Administrateur / Viewer). Toutes les actions sensibles sont enregistrées dans un journal d’audit.\par
+\Needspace{0.63\textheight}
+\subsection*{1.4. Besoins non fonctionnels :}
+Les besoins non fonctionnels concernent la qualité du système et son bon fonctionnement, indépendamment des fonctionnalités proposées.\par
+\ub{Sécurité :}\par
+L’accès aux APIs doit être protégé par une authentification obligatoire. Les mots de passe sont stockés sous forme de hachage BCrypt afin d’améliorer la sécurité. Le système utilise aussi un contrôle d’accès basé sur les rôles ainsi qu’un journal d’audit pour enregistrer les actions importantes.\par
+\ub{Performance :}\par
+Le système doit afficher les métriques et les alertes presque en temps réel, avec seulement quelques secondes entre la réception d’une donnée et son affichage dans l’interface. Il doit également pouvoir gérer les métriques de plusieurs équipements sans dégradation notable des performances, tout en gardant des graphiques fluides même avec un historique important.\par
+\ub{Fiabilité :}\par
+Le système utilise WebSocket pour transmettre en temps réel les alertes et les métriques vers les interfaces. En cas de coupure temporaire, le client WebSocket doit se reconnecter automatiquement.. Le système doit aussi détecter les équipements hors ligne grâce à un mécanisme de heartbeat. Lors du redémarrage, il doit pouvoir restaurer son état à partir des dernières métriques enregistrées.\par
+\ub{Convivialité :}\par
+Interface graphique claire, codes couleur cohérents (rouge = critique, orange = avertissement, vert = normal), notifications visuelles immédiates pour les événements critiques, application mobile adaptée aux usages en déplacement.\par
+\ub{Maintenabilité :}\par
+Le système repose sur une architecture en couches séparant la présentation, la logique métier et la persistance des données. L’utilisation de technologies standards et bien documentées facilite la maintenance. Le code doit rester organisé en modules clairs, avec des logs détaillés pour aider au diagnostic en cas de problème.\par
+\subsection*{1.5. Diagramme de cas d'utilisation :}
+Le diagramme ci-dessous synthétise l'ensemble des interactions entre les acteurs et le système. Il concerne l'interface web, qui regroupe l'ensemble des fonctionnalités. L'application mobile, qui propose un sous-ensemble de ces cas d'utilisation, est traitée dans la section suivante avec un tableau comparatif.\par
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.90\textwidth]{images/fig_p20_004.png}
+\caption*{\textbf{Figure 1 : Diagramme de cas d'utilisation du système}}
+\end{figure}
+\subsection*{1.6. Comparaison Web et Mobile :}
+L’application mobile propose une partie des fonctionnalités disponibles sur le tableau de bord web. Elle est principalement destinée à la supervision du système et au suivi des événements à distance. Son principal avantage est de permettre à l’utilisateur de rester informé en temps réel grâce aux notifications push, même lorsque l’application n’est pas ouverte.\par
+Le tableau suivant résume les fonctionnalités disponibles sur chaque plateforme.\par
+\begin{table}[H]
+\centering
+\caption*{\textbf{Tableau 1 : Comparaison des infrastructures Web et Mobile}}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{|p{0.55\textwidth}|c|c|}
+\hline
+\rowcolor{gray!25}\textbf{Fonctionnalité} & \textbf{Web} & \textbf{Mobile}\\ \hline
+Authentification (JWT) & \yes & \yes\\ \hline
+Tableau de bord & \yes & \yes\\ \hline
+Consultation des métriques & \yes & \yes\\ \hline
+Historique des métriques & \yes & \pfenon\\ \hline
+Consultation des incidents & \yes & \yes\\ \hline
+Détail et analyse d'une attaque & \yes & \pfenon\\ \hline
+Acquittement d'un incident & \yes & \pfenon\\ \hline
+Notifications push & \pfenon & \yes\\ \hline
+Terminal SSH & \yes & \pfenon\\ \hline
+Contrôle des équipements (Power) & \yes & \pfenon\\ \hline
+Gestion des playbooks SOAR & \yes & \pfenon\\ \hline
+Gestion des règles d'alerte & \yes & \pfenon\\ \hline
+Gestion des utilisateurs & \yes & \pfenon\\ \hline
+Configuration e-mail & \yes & \pfenon\\ \hline
+\end{tabular}
+\end{table}
+Dans ce contexte, l’application mobile permet également de superviser le système depuis n’importe où et de consulter les informations essentielles, telles que l’état des équipements, les métriques et les alertes détectées. Elle offre ainsi un accès rapide aux données de supervision à distance, tandis que les actions plus avancées restent réservées à l’interface web.\par
+\clearpage
+\chapter*{\ub{CHAPITRE 2 : CONCEPTION}}
+\addcontentsline{toc}{chapter}{CHAPITRE 2 : CONCEPTION}
+\subsection*{2.1. Architecture globale :}
+\subsection*{2.1.1. Vue d'ensemble :}
+Cette plateforme suit une architecture en trois couches. C’est une approche assez courante en développement logiciel. Elle permet de bien séparer les rôles, ce qui rend le code plus facile à maintenir et à faire évoluer. Chaque couche dialogue uniquement avec ses voisines, via des interfaces clairement définies.\par
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.90\textwidth]{images/fig_p23_005.png}
+\caption*{\textbf{Figure 2 : Architecture globale}}
+\end{figure}
+\subsection*{2.1.2. Les trois couches :}
+\textbf{Couche Infrastructure :} Cette couche regroupe l’ensemble des équipements supervisés par le système. Dans notre cas, elle est simulée à l’aide de Containerlab et Docker, avec différents éléments comme des routeurs, des serveurs (web, DNS, FTP, base de données), des postes clients, ainsi qu’une machine attaquante utilisée uniquement pour les tests et la génération du dataset. Sur chaque équipement, un agent de métriques (script Python metrics.py) collecte les informations système et réseau localement, puis les envoie vers la couche de traitement via HTTP.\par
+\textbf{Couche Traitement :} Cette couche représente la partie principale du système. Elle est composée de trois composants qui interagissent ensemble :\par
+\begin{itemize}[leftmargin=1.2cm,itemsep=0.25em]
+\item \textbf{Backend Spring Boot (Java) :} il reçoit les métriques, les stocke dans la base de données, applique les règles d’alerte, gère les sessions d’attaque et expose les API REST utilisées par les interfaces. Il envoie aussi les événements en temps réel via WebSocket.
+\item \textbf{Module de machine learning (Flask Python) :} il contient les modèles XGBoost et Isolation Forest. Il récupère régulièrement les nouvelles métriques depuis le backend, applique les modèles, puis renvoie les résultats de détection.
+\item \textbf{Base de données MySQL :} elle stocke les métriques, les attaques détectées, les règles d’alerte, les playbooks SOAR, les utilisateurs et les logs d’audit.
+\end{itemize}
+\textbf{Couche Présentation :} Cette couche regroupe les interfaces utilisateur :\par
+\begin{itemize}[leftmargin=1.2cm,itemsep=0.25em]
+\item \textbf{Tableau de bord Web (React / JavaScript),} servi par Nginx qui joue aussi le rôle de reverse proxy vers le backend.
+\item \textbf{Application mobile (Flutter / Dart),} qui utilise les mêmes API REST et reçoit les notifications push. Elle est le seul composant qui fonctionne en dehors du cyber-range, directement sur le smartphone de l’utilisateur.
+\end{itemize}
+\ub{Note importante :} Comme le montre la Figure 2, les conteneurs supervision-web, supervision-app, supervision-ai et supervision-db sont également déployés dans la zone Management du cyber-range. L’ensemble du système, y compris la plateforme, fonctionne donc sur Containerlab. Ce schéma combine à la fois la vue logique (rôles des composants) et la vue de déploiement (emplacement réel des services).\par
+\subsection*{2.1.3. Communication entre couches :}
+La communication entre les différentes couches repose principalement sur trois protocoles.\par
+\begin{itemize}[leftmargin=1.2cm,itemsep=0.25em]
+\item \textbf{HTTP/REST} est utilisé pour les échanges classiques, comme la récupération de données, la configuration ou l’exécution d’actions. Toutes les API du backend Spring Boot suivent une architecture REST et sont sécurisées à l’aide de jetons JWT.
+\item \textbf{WebSocket (STOMP)} est utilisé pour la transmission des événements en temps réel. Lorsqu’une nouvelle métrique est reçue, qu’une attaque est détectée ou qu’un équipement devient indisponible, le backend diffuse immédiatement l’information aux clients connectés. Cela permet d’éviter le polling continu et de réduire la latence d’affichage.
+\item \textbf{SSH} est utilisé entre le backend et les équipements supervisés pour exécuter des commandes à distance, notamment via le terminal intégré ou les playbooks SOAR. Le système maintient des connexions SSH réutilisables afin de limiter le coût des connexions répétées.
+\end{itemize}
+\subsection*{2.1.4. Choix techniques structurants :}
+Plusieurs choix techniques ont été effectués lors de la conception du système. Tout d’abord, le backend Java et le module de machine learning ont été séparés. Le backend gère la logique métier avec Spring Boot et JPA, tandis que le module de machine learning fonctionne dans un service Python indépendant. Cette séparation permet d’utiliser facilement des bibliothèques comme scikit-learn et XGBoost sans impacter le backend. Ensuite, nous avons choisi une base de données centralisée MySQL plutôt qu’une solution spécialisée. C’est une technologie simple à déployer, largement utilisée et bien intégrée avec Spring Boot via JPA. Enfin, le système utilise deux mécanismes pour les notifications : WebSocket pour les utilisateurs connectés (web et mobile en premier plan), et flutter\_local\_notifications pour les notifications push lorsque l’application mobile est en arrière-plan.\par
+\subsection*{2.2. Topologie réseau :}
+\subsection*{2.2.1. Présentation générale :}
+Le cyber-range est basé sur une topologie réseau multizones qui représente une infrastructure d’opérateur télécom ou d’entreprise. L’objectif est d’avoir un environnement assez réaliste tout en restant facilement exécutable sur un ordinateur portable classique. Toute la topologie est décrite dans un fichier Containerlab (topology.yml), ce qui permet de la déployer simplement avec une seule commande.\par
+L’infrastructure est composée de 12 conteneurs répartis sur trois zones réseau différentes, séparées par deux routeurs. Cette segmentation suit le principe de défense en profondeur : les zones ne communiquent pas directement entre elles, et tout échange passe par un routeur. Cela permet d’appliquer des règles de filtrage à chaque point de passage.\par
+\pfeimage{images/fig_p26_006.png}
+\begin{center}
+\textbf{Figure 3 : Topologie réseau}
+\end{center}
+\subsection*{2.2.2. Les quatre zones :}
+Zone WAN (10.0.0.0/24) : Cette zone représente l'internet public vu depuis l'opérateur. Elle contient : • Deux clients externes (ext-client1, ext-client2) qui simulent du trafic utilisateur légitime. • Une machine attaquante (attacker) utilisée pour simuler des attaques pendant la génération du dataset et lors des démonstrations. La zone WAN est connectée au routeur de bordure (edge-router), seul point d'entrée vers le reste de l'infrastructure.\par
+Zone DMZ (10.0.1.0/24) : La zone démilitarisée héberge les services exposés au public : • web-server: serveur HTTP (Apache + PHP) • dns-server : serveur DNS (BIND9) Cette zone est volontairement isolée du LAN interne pour limiter l'impact d'une éventuelle compromission. Un attaquant qui parvient à pénétrer le serveur web ne peut pas atteindre directement la base de données ou les postes clients.\par
+\ub{Zone LAN (10.0.2.0/24) :}\par
+C'est le réseau interne de l'organisation : • ftp-server : serveur de transfert de fichiers (vsftpd) • db-server : serveur de base de données (MySQL pour le simulateur, sans rapport avec la base dbTelecom) • pc1, pc2 : postes clients qui simulent l'activité d'utilisateurs internes\par
+Cette zone est protégée par le routeur cœur (core-router) et n'est pas accessible directement depuis le WAN.\par
+Zone Management (10.0.4.0/24)\par
+La zone de management regroupe les composants de cette plateforme elle-même : • supervision-app: backend Spring Boot • supervision-ai: module de machine learning Flask • supervision-db : base de données MySQL de la plateforme • supervision-web: serveur Nginx + tableau de bord React\par
+Cette zone est isolée des autres pour deux raisons. D'une part, elle ne doit pas être affectée par les attaques visant les zones supervisées. D'autre part, elle nécessite un accès à toutes les autres zones pour collecter les métriques et exécuter des commandes via SSH.\par
+\subsection*{2.2.3. Plan d'adressage IP :}
+Le tableau ci-dessous résume le plan d'adressage du cyber-range. Tableau 2 : Plan d'adressage IP Équipement Zone Adresse IP Rôle ext-client1 WAN 10.0.0.10 Client externe ext-client2 WAN 10.0.0.11 Client externe Attacker WAN 10.0.0.100 Machine attaquante edge-router WAN ↔\par
+\subsection*{10.0.0.1 / 10.0.4.1 Routeur de bordure}
+Mgmt\par
+web-server DMZ 10.0.1.10 Serveur HTTP dns-server DMZ 10.0.1.20 Serveur DNS core-router DMZ ↔\par
+\subsection*{10.0.1.1 / 10.0.2.1 /}
+Routeur cœur\par
+LAN ↔ 10.0.4.2\par
+Mgmt\par
+ftp-server LAN 10.0.2.10 Serveur FTP db-server LAN 10.0.2.20 Serveur de base de données\par
+pc1 LAN 10.0.2.30 Poste client pc2 LAN 10.0.2.31 Poste client supervision-app Mgmt 10.0.4.10 Backend Spring Boot supervision-ai Mgmt 10.0.4.11 Module de machine learning Flask supervision-db Mgmt 10.0.4.12 Base MySQL supervision-web Mgmt 10.0.4.13 Serveur Nginx + React\par
+\subsection*{2.2.4. Règles de filtrage et flux autorisés :}
+La topologie en zones n'a de sens que si l'on définit clairement quels flux sont autorisés entre elles. Cette matrice de flux complète la description des zones : elle répond à la question qui a le droit de parler à qui, et sur quel port ? Le tableau ci-dessous résume les règles appliquées au niveau des deux routeurs (edge-router et core-router). Une connexion établie permet ensuite un échange bidirectionnel, le tableau décrit donc principalement les connexions initiées.\par
+Tableau 3 : Règle de filtrage entre les zones\par
+Zone source Zone destination Port / Service Decision Internet (WAN) DMZ HTTP, HTTPS, DNS Accepté Internet (WAN) LAN — Refusé Internet (WAN) Management — Refusé DMZ Internet (WAN) — Accepté DMZ LAN — Refusé DMZ Management 8080 (métriques) Accepté LAN Internet (WAN) — Accepté LAN DMZ — Accepté LAN Management 8080 (métriques) Accepté Management Toutes les zones 22 (SSH), 8080 Accepté\par
+La DMZ reste accessible depuis l’extérieur, mais elle est isolée du reste du réseau afin d’éviter qu’un serveur compromis puisse atteindre le LAN. Le LAN, quant à lui, reste protégé : aucun accès externe direct n’est autorisé, mais les postes peuvent communiquer avec Internet et les services de la DMZ. La zone Management, qui héberge cette plateforme, peut accéder aux différentes zones pour collecter les métriques et exécuter des commandes via SSH. En retour, les équipements supervisés peuvent envoyer leurs métriques vers cette zone via le port 8080\par
+Le tableau suivant complète cette matrice en listant les ports utilisés par chaque service. Tableau 4 : Ports et protocoles utilisés Service Port Protocole Équipement Zone Serveur HTTP 80 TCP web-server DMZ Serveur DNS 53 UDP dns-server DMZ Serveur FTP 21 TCP ftp-server LAN Base de données interne 3306 TCP db-server LAN SSH (administration) 22 TCP tous les Toutes\par
+équipements\par
+Backend Spring Boot 8080 TCP supervision-app Management Module de machine learning\par
+\subsection*{5000 TCP supervision-ai Management}
+Flask Base dbTelecom 3306 TCP supervision-db Management Tableau de bord Nginx 80 TCP supervision-web Management\par
+Ces règles sont implémentées sur les routeurs en utilisant iptables. Un extrait du script de configuration est présenté en annexe.\par
+\subsection*{2.2.5. Justification du choix de Containerlab :}
+Plusieurs outils permettent de simuler une topologie réseau, comme GNS3, EVE-NG, cisco packet ..ect. Dans ce projet, nous avons choisi Containerlab pour plusieurs raisons. D’abord, le déploiement est rapide et simple : une seule commande (containerlab deploy) permet de lancer toute l’infrastructure à partir d’un fichier YAML. Containerlab gère automatiquement les bridges, les interfaces et les routes réseau. L’outil reste également léger, car les équipements sont exécutés sous forme de conteneurs Docker et non de machines virtuelles. Les 15 conteneurs peuvent donc fonctionner correctement sur un ordinateur portable avec\par
+\subsection*{8 Go de RAM.}
+Comme Containerlab utilise des images Docker standards, il est aussi possible d’intégrer facilement différents services comme Apache, MySQL ou BIND9. De plus, j’ai choisi Containerlab afin de découvrir un outil moderne différent de GNS3 et des outils de simulation réseau classique..., tout en renforçant mes compétences en Docker et en technologies de virtualisation légère.\par
+\subsection*{2.3. Conception de la base de données et diagramme de classes :}
+\subsection*{2.3.1. Vue d'ensemble :}
+La base de données stocke l'ensemble des données persistantes de la plateforme : métriques historiques, sessions d'attaque, configuration utilisateur, journaux d'audit. Nous avons choisi MySQL pour sa maturité, sa large diffusion, et sa bonne intégration avec Spring Boot via JPA et Hibernate. Le schéma comprend onze tables organisées en quatre familles : données de supervision, gestion des incidents, configuration, et audit. Comme nous utilisons JPA, chaque table correspond directement à une entité Java (classe annotée @Entity). Le diagramme de classes ci-dessous représente donc à la fois la structure du code et la structure de la base.\par
+\pfeimage{images/fig_p31_007.png}
+\begin{center}
+\textbf{Figure 4 : Diagramme de classes}
+\end{center}
+\subsection*{2.3.2. Conventions techniques :}
+Toutes les entités JPA suivent les mêmes conventions : \ub{un identifiant numérique auto-incrémenté} en clé primaire, des horodatages techniques \ub{(createdAt, updatedAt)} gérés automatiquement, et les relations modélisées par les annotations standard @OneToOne, @OneToMany, @ManyToOne selon les cas\par
+\subsection*{2.4. Diagrammes de séquence :}
+Nous présentons trois diagrammes de séquence qui illustrent les scénarios les plus représentatifs du fonctionnement du système. Le premier décrit le cycle complet d'une métrique, depuis sa réception jusqu'à la détection d'une éventuelle attaque et l'exécution d'un playbook. Le deuxième détaille le mécanisme de surveillance de l'état des équipements (online/offline). Le troisième porte sur l'authentification des utilisateurs\par
+\subsection*{2.4.1. Détection d'une attaque par le module de machine learning :}
+Ce premier scénario décrit comment une attaque est repérée par le module de machine learning, depuis la réception d'une métrique jusqu'à l'affichage d'une notification. L'exécution éventuelle d'un playbook SOAR est traitée séparément dans la section 2.6, pour ne pas surcharger ce diagramme.\par
+\pfeimage{images/fig_p32_008.png}
+\begin{center}
+\textbf{Figure 5 : Diagramme de séquence : cycle de supervision}
+\end{center}
+\subsection*{2.4.2. Surveillance de l'état des équipements :}
+Ce deuxième scénario complète le premier. Il décrit comment le système détecte qu'un équipement passe de l’état hors ligne à l’état en ligne, et inversement. C'est un point essentiel pour mesurer la disponibilité (SLA) et alerter quand quelque chose tombe en panne.\par
+\pfeimage{images/fig_p33_009.png}
+\begin{center}
+\textbf{Figure 6 : Diagramme de séquence : surveillance de l'état des équipements}
+\end{center}
+\subsection*{2.4.3. Authentification par JWT :}
+Ce dernier scénario décrit le processus d'authentification, qui s'applique aussi bien au tableau de bord web qu'à l'application mobile.\par
+\pfeimage{images/fig_p34_010.png}
+\begin{center}
+\textbf{Figure 7 : Diagramme de séquence : authentification par JWT}
+\end{center}
+\subsection*{2.5. Conception du module de machine learning :}
+\subsection*{2.5.1. Approche générale :}
+Le module de machine learning est séparé du backend principal et fonctionne dans un service Flask indépendant. Ce choix permet d’utiliser facilement les bibliothèques Python utilisées en machine learning comme scikit-learn, XGBoost ou pandas. Le module récupère régulièrement les dernières métriques depuis le backend, applique les modèles entraînés puis renvoie les prédictions obtenues.\par
+\subsection*{2.5.2 Deux modèles complémentaires :}
+Nous avons choisi d’utiliser deux modèles qui fonctionnent en parallèle. Le premier, XGBoost, sert à reconnaître les attaques connues présentes dans le dataset, comme les attaques DDoS, SYN flood, port scan ou force brute. Il est adapté aux données tabulaires comme les métriques système et fournit un score de confiance pour chaque prédiction. Le second modèle, Isolation Forest, est utilisé pour détecter les comportements anormaux. Il est entraîné uniquement avec des données normales puis signale les activités inhabituelles. Cette approche permet de détecter les attaques déjà connues mais aussi certaines anomalies qui ne figurent pas dans le dataset d’entraînement.\par
+\subsection*{2.5.3 Détection par interface réseau :}
+Dans notre approche, la détection est réalisée par interface réseau et non au niveau global de l’équipement. Par exemple, si un serveur possède plusieurs interfaces comme eth0 et eth1, chaque interface est analysée séparément. Cela permet de mieux localiser l’origine d’une attaque. Si une anomalie apparaît uniquement sur eth0, on peut supposer que l’attaque provient du côté WAN et non du LAN.\par
+\subsection*{2.5.4 Sliding window pour réduire les faux positifs :}
+Afin de réduire les fausses alertes, le système utilise une fenêtre glissante sur les prédictions. Une attaque n’est donc pas signalée dès la première détection ; le système attend plusieurs prédictions similaires sur une courte période. Par exemple, si trois prédictions sur quatre indiquent la même attaque sur la même interface, une AttackSession est créée. Cette méthode permet d’éviter les alertes causées par des anomalies temporaires.\par
+\subsection*{2.5.5 Choix du dataset :}
+Au lieu d’utiliser un dataset générique comme CICIDS2017 ou NSL-KDD, nous avons généré un dataset spécifique à notre topologie. Les attaques ont été générées à l’aide d’un script de simulation\par
+(attack\_simulator.py) utilisant des outils comme hping3, nmap et slowhttptest depuis la machine attaquante. Pendant les simulations, les métriques sont automatiquement collectées et étiquetées. Cette approche permet d’obtenir un dataset plus proche de notre environnement réel. Les données correspondent directement aux métriques collectées par notre agent, et les types d’attaques peuvent être adaptés selon les besoins du projet. Le processus complet de génération et de nettoyage du dataset sera présenté dans le chapitre 4.\par
+\subsection*{2.6 Conception du module de réponse automatisée :}
+\subsection*{2.6.1 Principe :}
+Le Module de réponse permet d’automatiser la réponse aux attaques détectées. Grâce à cette automatisation, le système peut réagir rapidement sans attendre une intervention manuelle. Le Module est intégré directement dans le backend Spring Boot. Il est déclenché après la création d’une AttackSession confirmée. Son rôle consiste à rechercher un playbook adapté à l’attaque détectée puis à l’exécuter via SSH sur l’équipement concerné.\par
+\subsection*{2.6.2 Structure d’un playbook :}
+Un playbook est une entité qui contient plusieurs informations importantes : le type d’attaque associé, l’équipement cible, les commandes shell à exécuter, le mode d’exécution (automatique ou manuel) ainsi que la priorité. Les commandes peuvent utiliser des variables dynamiques comme \{attackerIp\}, \{deviceName\} ou \{interfaceName\}. Ces variables sont remplacées automatiquement lors de l’exécution. Par exemple, la commande : iptables -A INPUT -s \{attackerIp\} -j DROP Permet de bloquer automatiquement l’adresse IP détectée comme source de l’attaque. L’exécution des commandes se fait via SSH à l’aide d’un pool de connexions réutilisables. Chaque action est enregistrée dans le journal d’audit, et la session est marquée comme mitigée lorsque l’exécution réussit.\par
+\subsection*{2.6.3 Périmètre :}
+Le module de réponse automatique est surtout efficace pour les attaques où l’adresse IP source peut être identifiée, comme les attaques par force brute, les scans ou certaines attaques applicatives. Dans le cas des attaques de type flood utilisant des IP usurpées, le blocage d’adresse IP devient moins utile. Le système peut alors appliquer d’autres mesures plus générales, comme le rate limiting ou le durcissement des paramètres TCP.\par
+\clearpage
+\chapter*{\ub{CHAPITRE 3 : TECHNOLOGIES UTILISÉES}}
+\addcontentsline{toc}{chapter}{CHAPITRE 3 : TECHNOLOGIES UTILISÉES}
+\subsection*{3.1 Introduction :}
+Ce chapitre présente les technologies que nous avons utilisées pour construire le système. Pour chaque outil, nous expliquons brièvement ce qu'il fait et pourquoi nous l'avons choisi. Nous suivons l'ordre logique de l'architecture du chapitre précédent : l'infrastructure, le backend, le module de machine learning, la base de données, les interfaces (web et mobile), et enfin les outils de développement utilisés au quotidien\par
+\subsection*{3.2 Infrastructure :}
+\subsection*{3.2.1 Containerlab :}
+\pfelogo[0.38\textwidth]{images/fig_p38_011.png}
+Containerlab [3] est un outil open-source qui permet de déployer et gérer des topologies réseau basées sur des conteneurs Docker. Il s'appuie sur un fichier de configuration au format YAML pour décrire toute une infrastructure routeurs, serveurs, postes clients, liens entre eux et la déploie en une seule commande. Dans ce projet, Containerlab nous a servi à construire l'ensemble du cyber-range : 15 conteneurs répartis en 4 zones (WAN, DMZ, LAN, Management), avec deux routeurs au milieu. Tout est décrit dans le fichier topology.yml, que nous lançons avec containerlab deploy au démarrage. Comme détaillé dans le chapitre 2, section 2.2.5, Nous avons choisi cet outil parce qu'il combine la légèreté de Docker avec une gestion fine du réseau. Les 15 conteneurs tournent confortablement sur un ordinateur portable avec 8 Go de RAM, ce qui ne serait pas possible avec des machines virtuelles classiques.\par
+\subsection*{3.2.2 Docker :}
+\pfelogo[0.48\textwidth]{images/fig_p39_012.png}
+Docker [4] est une plateforme de conteneurisation qui permet d'empaqueter une application et toutes ses dépendances dans une unité isolée appelée conteneur. Contrairement à une machine virtuelle, un conteneur partage le noyau du système hôte, ce qui le rend beaucoup plus léger, quelques dizaines de Mo en général. Dans ce projet, Docker est utilisé dans toute l’infrastructure. Chaque équipement du cyber-range fonctionne sous forme de conteneur Docker basé sur une image Linux. Cette plateforme utilise également plusieurs conteneurs séparés, comme supervision-app, supervision-ai, supervision-db et supervision-web. Pour chaque équipement, un Dockerfile a été créé afin de définir l’image utilisée, les paquets nécessaires et les scripts de démarrage. Nous avons choisi Docker car il s’agit aujourd’hui d’une solution largement utilisée pour la conteneurisation. Il offre une bonne compatibilité avec de nombreux logiciels disponibles sur Docker Hub, une documentation très riche, ainsi que des compétences utiles et réutilisables dans un environnement professionnel.\par
+\subsection*{3.3 Backend (Spring Boot et son écosystème) :}
+\subsection*{3.3.1 Java et Spring Boot :}
+\pfelogo[0.50\textwidth]{images/fig_p39_013.png}
+Spring Boot [5] est un framework Java pour construire des applications web modernes. Il fournit un serveur web intégré (Tomcat), une configuration automatique, et une intégration native avec un grand nombre d'outils tiers (JPA pour la persistance, Spring Security pour l'authentification, WebSocket pour les événements temps réel). Dans ce projet, Spring Boot constitue le cœur du backend. Il reçoit les métriques envoyées par les agents, les stocke dans la base de données, expose les API REST utilisées par le tableau de bord et l’application mobile, et diffuse les notifications via WebSocket. Il gère également l’authentification des utilisateurs ainsi que le Module de réponse automatisée chargé d’exécuter les playbooks. Nous avons choisi Spring Boot car c’est un framework mature, largement utilisé et bien documenté. De plus, nous l’avons étudié au cours de notre formation universitaire en licence, ce qui nous a permis de travailler plus efficacement et de développer le projet dans de bonnes conditions.\par
+\subsection*{3.3.2 Spring Security et JWT :}
+\pfelogo[0.52\textwidth]{images/fig_p40_014.png}
+Spring Security [6] est le module Spring qui gère l'authentification et l'autorisation. C'est lui qui intercepte chaque requête HTTP entrante et vérifie que l'utilisateur a les droits nécessaires. Pour les jetons, nous utilisons JWT [7] (JSON Web Tokens), un format standard répandu dans les API modernes, et les mots de passe sont stockés sous forme de hachage BCrypt. Dans ce projet, cette combinaison nous permet d'avoir une authentification stateless le même jeton fonctionne aussi bien pour le tableau de bord web que pour l'application mobile.\par
+\subsection*{3.4 \ub{Module de machine learning :}}
+\subsection*{3.4.1 Python et Flask :}
+\pfelogo[0.38\textwidth]{images/fig_p41_015.png}
+Python est un langage de programmation polyvalent, devenu la référence dans le domaine du machine learning grâce à son écosystème scientifique très riche (scikit-learn, XGBoost, pandas, NumPy). Flask [8], lui, est un micro-framework web Python qui permet de créer rapidement des services HTTP simples. Dans ce projet, Python est le langage utilisé pour le module de machine learning. Flask sert à exposer ce module sous forme de service web, pour que le backend Spring Boot puisse l'interroger via des requêtes HTTP standards. Le service Flask héberge les modèles entraînés (XGBoost et Isolation Forest) et renvoie ses prédictions à chaque appel. Nous avons choisi cette combinaison car Python est aujourd’hui très utilisé dans le domaine du machine learning. Flask, de son côté, est un framework léger et simple à mettre en place, tout en laissant une grande flexibilité dans le développement du service.\par
+\subsection*{3.4.2 XGBoost :}
+\pfelogo[0.55\textwidth]{images/fig_p41_016.png}
+XGBoost [9] (eXtreme Gradient Boosting) est une bibliothèque de machine learning basée sur le gradient boosting d'arbres de décision. Le modèle apprend en combinant de nombreux petits arbres faibles pour construire un classifieur fort, et il est reconnu pour ses excellentes performances sur les données tabulaires.\par
+Dans ce projet, XGBoost est le modèle principal de détection. Il classe chaque vecteur de métriques (CPU, mémoire, paquets par seconde, etc.) parmi plusieurs catégories : normal, synflood, portscan, bruteforce, etc. Pour chaque prédiction, il fournit aussi un score de confiance, que nous utilisons dans notre mécanisme de fenêtre glissante pour réduire les faux positifs. Nous avons choisi XGBoost car il offre de bonnes performances sur les données tabulaires comme nos métriques système. Il est rapide aussi bien pendant l’entraînement que lors des prédictions, et il fournit un score de confiance pour chaque classe, ce qui facilite la logique de détection utilisée dans ce système.\par
+\subsection*{3.4.3 Isolation Forest :}
+Isolation Forest [10] est un algorithme de détection d'anomalies non supervisé, fourni par scikit-learn. Son principe est simple : il isole les points en construisant des arbres aléatoires ; les anomalies, étant rares et différentes, sont isolées plus rapidement que les points normaux. Dans ce projet, Isolation Forest tourne en parallèle de XGBoost. Son rôle est de détecter les comportements anormaux qui ne correspondent à aucune classe connue, une attaque nouvelle, par exemple, que XGBoost n'aurait pas vue à l'entraînement.\par
+\subsection*{3.4.4 scikit-learn, pandas et NumPy :}
+\pfelogo[0.42\textwidth]{images/fig_p42_017.png}
+Ces trois bibliothèques forment la base de tout projet ML en Python. NumPy fournit les structures numériques de bas niveau et les opérations mathématiques rapides. Pandas [11] offre l'abstraction DataFrame pour manipuler des données tabulaires, comme une feuille Excel. scikit-learn est la bibliothèque centrale du ML classique : elle fournit Isolation Forest, mais aussi tous les outils de prétraitement, de validation croisée et d'évaluation. Dans ce projet, ces bibliothèques sont utilisées surtout dans le notebook Jupyter de préparation du dataset, et à l'exécution pour préparer les vecteurs de caractéristiques avant chaque prédiction.\par
+\subsection*{3.5 Base de données :}
+\subsection*{3.5.1 MySQL :}
+\pfelogo[0.44\textwidth]{images/fig_p43_018.png}
+MySQL [12] est un système de gestion de base de données relationnelle très utilisé. Dans ce projet, il sert à stocker les données de la plateforme : métriques, sessions d’attaque, utilisateurs, règles d’alerte, playbooks SOAR et journaux d’audit. Nous avons choisi MySQL car c’est une solution fiable, bien documentée et facile à intégrer avec Spring Boot via JPA. Pour le volume de données traité dans ce projet, il offre des performances largement suffisantes.\par
+\subsection*{3.6 Tableau de bord Web :}
+\subsection*{3.6.1 React :}
+\pfelogo[0.46\textwidth]{images/fig_p43_019.png}
+React [13] est une bibliothèque JavaScript open-source pour construire des interfaces utilisateurs. Elle est basée sur un modèle de composants : on découpe l'interface en petits blocs réutilisables (boutons, graphiques, tableaux), chacun avec son propre état et son propre rendu. Quand l'état change, React met à jour automatiquement l'affichage.\par
+Dans ce projet, React sert à construire le tableau de bord web. Chaque page (Accueil, Surveillance, Sécurité, Terminal, Paramètres) est un assemblage de composants React qui communiquent avec le backend via des appels HTTP et reçoivent les événements temps réel via WebSocket. Nous avons choisi React parce qu'il s'agit de l'une des bibliothèques les plus utilisées au monde pour les interfaces web. La communauté est très large, ce qui veut dire beaucoup de tutoriels, beaucoup de bibliothèques tierces (Recharts pour nos graphiques, par exemple), et beaucoup de réponses disponibles en cas de problème.\par
+\subsection*{3.6.2 Nginx :}
+\pfelogo[0.32\textwidth]{images/fig_p44_020.png}
+Nginx [14] est un serveur web open-source connu pour sa performance et sa légèreté. Il permet de servir des fichiers statiques (HTML, CSS, JavaScript) et peut aussi fonctionner comme reverse proxy, en redirigeant les requêtes des clients vers d’autres services internes. Dans ce projet, Nginx est utilisé dans le conteneur supervision-web. Il sert les fichiers du tableau de bord React et agit aussi comme reverse proxy vers le backend Spring Boot et les endpoints WebSocket. Le navigateur communique donc uniquement avec Nginx, qui redirige chaque requête vers le bon service. Nous avons choisi Nginx car c’est une solution rapide, légère et largement utilisée. Sa configuration reste simple, et nous avions déjà une certaine expérience avec cet outil.\par
+\subsection*{3.7 Application mobile :}
+\subsection*{3.7.1 Flutter :}
+\pfelogo[0.36\textwidth]{images/fig_p45_021.png}
+Flutter [15] est un framework open-source de Google pour créer des applications mobiles à partir d'une seule base de code. Le langage utilisé est Dart. À la compilation, Flutter produit une application Android et une application iOS natives, avec un seul code source partagé. Dans ce projet, Flutter sert à construire l'application mobile compagnon du tableau de bord web. Elle permet de consulter les métriques en temps réel et de recevoir des notifications push quand un incident est détecté. Elle communique avec le backend via les mêmes API REST que le tableau de bord, et reçoit les événements temps réel via WebSocket. Nous avons choisi Flutter pour son approche cross-platform, permettant de développer une seule application pour Android et iOS. Cela facilite le développement et assure de bonnes performances pour l’affichage en temps réel. Nous avions également une certaine expérience avec Flutter, ce qui a facilité son intégration dans le projet.\par
+\subsection*{3.8 Outils de développement :}
+\subsection*{3.8.1 IDEs et éditeurs de code :}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.19\textwidth]{images/fig_p45_022.png}\hfill
+\includegraphics[width=0.19\textwidth]{images/fig_p45_023.png}\hfill
+\includegraphics[width=0.19\textwidth]{images/fig_p45_024.png}\hfill
+\includegraphics[width=0.19\textwidth]{images/fig_p45_025.png}
+\end{figure}
+Ce projet touche à plusieurs langages et environnements, donc nous avons utilisé plusieurs IDEs en parallèle, chacun pour ce qu'il fait le mieux. IntelliJ IDEA est l'IDE de référence pour Java, développé par JetBrains. Nous l'avons utilisé pour tout le développement du backend Spring Boot.\par
+PyCharm, également de JetBrains, est spécialisé pour Python. C'est dans PyCharm que nous avons développé le module de machine learning basé sur Flask, ainsi que les scripts liés au dataset (préparation, attaque, agents). Visual Studio Code est un éditeur léger et polyvalent de Microsoft. Nous l'avons utilisé pour le code React du tableau de bord, pour les fichiers de topologie Containerlab (topology.yml), et plus généralement pour toute la configuration de l'infrastructure (Dockerfiles, scripts shell, fichiers YAML). Android Studio est l'IDE officiel pour le développement Android, fourni par Google. Comme Flutter s'appuie sur les outils Android sous le capot, nous l'avons utilisé pour développer et tester l'application mobile, notamment pour la gestion des émulateurs et la compilation des versions Android.\par
+\subsection*{3.8.2 Postman :}
+\pfelogo[0.28\textwidth]{images/fig_p46_026.png}
+Postman est un outil pour tester les API REST. Pendant le développement du backend, nous l'avons utilisé pour envoyer manuellement des requêtes au serveur Spring Boot (POST, GET, PUT, DELETE) et vérifier que les réponses étaient correctes, avant même que les interfaces (web et mobile) ne soient prêtes.\par
+\subsection*{3.8.3 Lucidchart :}
+\pfelogo[0.50\textwidth]{images/fig_p46_027.png}
+Lucidchart est une plateforme en ligne pour créer des diagrammes UML, architecture, topologie réseau, schémas de bases de données. Dans ce projet, Lucidchart a servi à créer tous les diagrammes présents dans ce rapport : diagramme de cas d'utilisation, topologie réseau, diagramme de classes, diagrammes de séquence, et architecture en trois couches. Nous l'avons choisi pour ses templates UML standards prêts à l'emploi, son interface intuitive, et l'export en haute résolution pour intégration dans le rapport.\par
+\subsection*{3.8.4 Jupyter Notebook :}
+\pfelogo[0.50\textwidth]{images/fig_p47_028.png}
+Jupyter Notebook [16] est un environnement interactif de programmation, très utilisé en science des données. Il permet d'écrire du code Python par petits blocs (cells), de les exécuter un par un, et de voir immédiatement le résultat y compris les graphiques et les tableaux. Dans ce projet, Jupyter a été utilisé pour la préparation du dataset destiné aux modèles d’apprentissage. Le notebook (dataset\_preparation.ipynb) décrit les étapes de nettoyage, de filtrage et d’équilibrage des données, et peut être exécuté à tout moment. Nous avons choisi Jupyter car il est adapté aux tâches d’expérimentation et de traitement des données, avec une approche étape par étape. Nous l’avions déjà utilisé pour des travaux similaires, ce qui a facilité son utilisation dans ce projet.\par
+.\par
+\clearpage
+\chapter*{\ub{CHAPITRE 4 : RÉALISATION ET RÉSULTATS}}
+\addcontentsline{toc}{chapter}{CHAPITRE 4 : RÉALISATION ET RÉSULTATS}
+\subsection*{4.1. Mise en place de l\'environnement :}
+L'ensemble du cyber-range est décrit dans un seul fichier YAML (topology.yml). Une fois Containerlab installé sur la machine hôte, une seule commande suffit pour tout déployer : sudo containerlab deploy -t topology.yml Containerlab crée les bridges Linux, télécharge les images Docker si nécessaire, démarre les 15 conteneurs et configure les liens entre eux. L'opération dure une à deux minutes la première fois. À la fin, un tableau récapitulatif s'affiche avec le nom et l'adresse IP de chaque conteneur.\par
+\pfeimage{images/fig_p49_029.png}
+\begin{center}
+\textbf{Figure 8 : Déploiement du topologie réseau avec Containerlab}
+\end{center}
+Une fois les conteneurs en place, la plateforme démarre automatiquement dans la zone Management. Quelques secondes plus tard, le tableau de bord est accessible depuis le navigateur, et les agents commencent à envoyer leurs métriques.\par
+\subsection*{4.2 Dataset et modèles d'intelligence artificielle :}
+\subsection*{4.2.1 Génération du dataset :}
+Plutôt que d'utiliser un dataset générique, nous avons généré notre propre dataset depuis notre infrastructure. Le script attack\_simulator.py lance des attaques contre les équipements du cyber-range et prévient le backend avant et après chaque attaque. Pendant ce temps, les agents continuent à envoyer leurs métriques, qui sont automatiquement étiquetées selon l'attaque en cours (portscan, bruteforce, synflood, etc.). Quand aucune attaque n'est lancée, l'étiquette est normale.\par
+À la fin, les métriques sont exportées depuis MySQL via une jointure SQL dans un fichier dataset\_raw.csv. Ce fichier brut contient toutes les lignes (serveurs et routeurs mélangés, avec beaucoup de colonnes inutilisables en l'état) et doit être nettoyé avant de pouvoir servir à l'entraînement.\par
+\subsection*{4.2.2 Préparation du dataset avec Jupyter :}
+Le nettoyage du dataset se fait dans un notebook Jupyter (dataset\_preparation.ipynb). Plusieurs étapes sont appliquées progressivement : suppression des lignes inutiles, correction de certaines étiquettes, séparation des données serveur/routeur, suppression des colonnes peu utiles ou trop corrélées, puis équilibrage des classes. Le notebook produit ensuite deux datasets distincts : un pour les serveurs et un autre pour les routeurs. Cette séparation est importante\par
+\pfeimage{images/fig_p50_030.png}
+\begin{center}
+\textbf{Figure 9 : Notebook Jupyter : aperçu du dataset}
+\end{center}
+À la fin du pipeline, le notebook produit aussi un graphique qui montre la distribution finale des étiquettes pour les deux datasets\par
+\pfeimage{images/fig_p50_031.png}
+\begin{center}
+\textbf{Figure 10 : Distribution finale des classes du dataset}
+\end{center}
+À la sortie, on obtient deux fichiers : dataset\_server.csv (\textasciitilde{}822 lignes × 32 colonnes) et dataset\_router.csv (\textasciitilde{}590 lignes × 20 colonnes). Nous avons séparé les deux parce qu'une même attaque ne se manifeste pas de la même façon sur un serveur (la cible) et sur un routeur (qui ne fait que transiter le trafic).\par
+\subsection*{4.2.3 Entraînement des modèles et résultats :}
+L'entraînement à proprement parler se fait avec le script trainer.py côté Flask, en dehors de Jupyter. Pour chaque jeu de données (serveur ou routeur), nous entraînons deux modèles : XGBoost comme classifieur multi-classes et Isolation Forest entraîné uniquement sur les lignes normales pour détecter les anomalies inconnues. Les résultats obtenus sur les datasets sont satisfaisants : l'accuracy atteint 98,2 \% pour le modèle serveur, et 98,3 \% pour le modèle routeur Bien que je n’aie pas besoin de collecter une grande quantité de données, chaque attaque présentait une signature métrique claire, avec de bonnes performances sur les attaques les plus représentées comme SYN flood, DDoS et force brute,\par
+\subsection*{4.3 Tableau de bord Web :}
+Le tableau de bord web est le point d'entrée principal de la plateforme. Il regroupe les principales fonctionnalités de supervision dans une seule interface, accessible depuis un navigateur. Cette section présente les différentes pages dans l'ordre dans lequel un utilisateur les rencontre.\par
+\subsection*{4.3.1 Authentification :}
+L'accès passe par une page de connexion classique. L'utilisateur saisit son nom d'utilisateur et son mot de passe, et le backend renvoie un jeton JWT en cas de succès. Les utilisateurs Administrateur voient toutes les fonctionnalités ; les Viewer n'ont pas accès au Terminal ni aux Paramètres.\par
+\pfeimage{images/fig_p51_032.png}
+\begin{center}
+\textbf{Figure 11 : Page de connexion de la table de bord}
+\end{center}
+\subsection*{4.3.2 Mise en page et page d'accueil :}
+Une fois authentifié, l'utilisateur voit en permanence deux zones autour de la page courante : la barre latérale à gauche et l'en-tête en haut. La barre latérale sert à la navigation et à l'état du système. Elle contient le logo, les liens vers les pages principales, et la liste de tous les équipements regroupés par catégorie (Routers, Servers, Management, Clients). Un point de couleur à côté de chaque équipement indique son état : vert (en ligne), rouge (sous attaque), gris (hors ligne). L'en-tête affiche le titre de la page, une cloche de notifications avec un badge pour les alertes non acquittées, et les informations de l'utilisateur. La page d’accueil donne une vue globale du système. Elle affiche plusieurs cartes résumant l’état de la plateforme (attaques actives, équipements normaux, état du module de machine learning, etc.). Une carte de topologie montre également le réseau et met en évidence les équipements sous attaque. La partie inférieure contient l’historique des événements récents et des attaques détectées.\par
+\pfeimage{images/fig_p52_033.png}
+\begin{center}
+\textbf{Figure 12 : Vue d'ensemble de la table de bord (sidebar, header et accueil)}
+\end{center}
+Un second onglet SLA présente un tableau de disponibilité par équipement (durée d'indisponibilité, pourcentage de disponibilité, statut HEALTHY / WARNING / CRITICAL).\par
+\pfeimage{images/fig_p53_034.png}
+\begin{center}
+\textbf{Figure 13 : Page SLA}
+\end{center}
+\subsection*{4.3.3 Surveillance :}
+La page Surveillance est faite pour la comparaison rapide entre équipements. Elle présente six graphiques en barres qui placent tous les équipements côte à côte : CPU, mémoire, disque, débit réseau, latence, et nombre de connexions. Cliquer sur une barre ouvre le panneau latéral de l'équipement concerné.\par
+\pfeimage{images/fig_p53_035.png}
+\begin{center}
+\textbf{Figure 14 : Page de surveillance}
+\end{center}
+\subsection*{4.3.4 \textbf{Sécurité :}}
+La page Sécurité regroupe les différents événements liés à la supervision et à la sécurité du système. L’onglet Alertes affiche les alertes générées par les règles du système, par exemple lorsqu’un équipement devient inaccessible, qu’une interface réseau tombe en panne ou qu’un seuil défini dans le trigger rule est dépassé\par
+\pfeimage{images/fig_p54_036.png}
+\begin{center}
+\textbf{Figure 15 : Page de sécurité}
+\end{center}
+L’onglet Attack Historie contient l’historique des attaques détectées par le module de machine learning, avec des informations comme le type d’attaque, l’équipement concerné et la date de détection.\par
+\pfeimage{images/fig_p54_037.png}
+\begin{center}
+\textbf{Figure 16 : Onglet historique d'incident}
+\end{center}
+Enfin, l’onglet Activity Log enregistre certaines actions importantes réalisées sur la plateforme, comme des modifications dans les paramètres ou l’utilisation du terminal distant.\par
+\pfeimage{images/fig_p55_038.png}
+\begin{center}
+\textbf{Figure 17 : Onglet Journal d’activité}
+\end{center}
+\subsection*{4.3.5 Panneau latéral d'un équipement :}
+Quand l’utilisateur clique sur un équipement, un panneau latéral s’ouvre avec plusieurs onglets permettant de consulter les informations système, les résultats du module de machine learning, les interfaces réseau, l’historique des métriques, les compteurs réseau et les journaux. Les administrateurs disposent également de boutons pour démarrer, arrêter ou redémarrer le conteneur.\par
+\pfeimage{images/fig_p55_039.png}
+\pfeimage{images/fig_p55_040.png}
+\begin{center}
+\textbf{Figure 18 : Panneau latéral d'un équipement : onglet Vue d’ensemble et KPI}
+\end{center}
+\pfeimage{images/fig_p56_041.png}
+\pfeimage{images/fig_p56_042.png}
+\begin{center}
+\textbf{Figure 19 : Panneau latéral d'un équipement : Historique et propriété}
+\end{center}
+\subsection*{4.3.6 Terminal :}
+Le Terminal permet à un administrateur d'exécuter des commandes shell sur n'importe quel équipement du cyber-range, depuis le navigateur. Le backend ouvre une session SSH vers l'équipement choisi, exécute la commande, et renvoie le résultat. C'est pratique pour des vérifications rapides (ifconfig, netstat, tail -f) sans avoir à ouvrir une vraie session SSH.\par
+\pfeimage{images/fig_p56_043.png}
+\begin{center}
+\textbf{Figure 20 : Page de console terminal distant}
+\end{center}
+\subsection*{4.3.7 Paramètres :}
+La page Paramètres centralise toute la configuration : contrôle du module de machine learning (activation de la prédiction, taille de la fenêtre glissante, seuil de confiance), système de protection (activation des playbooks), playbooks de réponse (CRUD), règles de seuil (par exemple « CPU > 90 \% »), commandes rapides, alertes par e-mail (SMTP), et gestion des utilisateurs. Cette page est accessible uniquement aux administrateurs.\par
+\pfeimage{images/fig_p57_044.png}
+\begin{center}
+\textbf{Figure 21 : Page de paramètre (modèle ML, playbook)}
+\end{center}
+Comme la page est longue, nous présentons deux captures pour couvrir l'essentiel.\par
+\pfeimage{images/fig_p57_045.png}
+\begin{center}
+\textbf{Figure 22 : Page de paramètre (règle de seuil et utilisateur ...)}
+\end{center}
+\subsection*{4.4 Scénarios d’incidents détectés :}
+Pour montrer le comportement du système face à différentes situations, nous présentons ici quelques scénarios d’incidents détectés par la plateforme. Lorsqu’un incident est identifié, une bannière d’alerte apparaît sur le tableau de bord et l’événement est ajouté à l’historique.\par
+\subsection*{4.4.1 Déclenchement d’une Trigger Rule :}
+Lorsqu’une métrique dépasse ou il est en dessous un seuil défini dans les paramètres (par exemple une utilisation CPU élevée), le système génère automatiquement une alerte WARNING visible sur le Dashboard et enregistrer dans historique des incidents\par
+\pfeimage{images/fig_p58_046.png}
+\begin{center}
+\textbf{Figure 23 : Déclenchement d’une Trigger Rule}
+\end{center}
+\subsection*{4.4.2 Équipement hors ligne / Interface inactive :}
+Si un équipement cesse d’envoyer ses métriques ou qu’une interface réseau devient inactive, le système le détecte automatiquement et affiche une alerte qu’il est hors ligne. L’équipement concerné change également d’état dans la sidebar.\par
+\pfeimage{images/fig_p58_047.png}
+\begin{center}
+\textbf{Figure 24 : Équipement hors ligne / Interface inactive}
+\end{center}
+\subsection*{4.4.3 Attaque détectée par module de machine learning :}
+Lors d’une attaque HTTP flood contre le serveur web, le module de machine learning détecte un comportement anormal sur l’équipement ciblé et génère une alerte sur le dashboard après validation.\par
+\pfeimage{images/fig_p58_048.jpeg}
+\begin{center}
+\textbf{Figure 25 : Attaque détectée par module de machine learning}
+\end{center}
+\subsection*{4.4.4 Panneau de détail d’une attaque :}
+L’utilisateur peut consulter les détails d’une attaque depuis la page Sécurité. Le panneau affiche les principales informations liées à l’incident, comme le type d’attaque, l’équipement concerné, la date de détection et certaines métriques associées.\par
+\pfeimage{images/fig_p59_049.png}
+\begin{center}
+\textbf{Figure 26 : Panneau de détail d’un incident}
+\end{center}
+\subsection*{4.5 Application mobile :}
+L'application mobile reprend une partie des fonctionnalités du tableau de bord web, dans une version pensée pour la mobilité. Elle est en lecture seule : on peut consulter les métriques, voir les incidents, et recevoir des notifications, mais pas modifier la configuration ni exécuter de commandes. Cette section présente les principales pages.\par
+\subsection*{4.5.1 Authentification :}
+L'application commence par un écran de connexion identique en logique à celui du dashboard web. L'utilisateur saisit ses identifiants, et le backend renvoie un jeton JWT qui est stocké de manière sécurisée sur le téléphone (Flutter Secure Storage). Ce jeton sert ensuite pour toutes les requêtes et pour la connexion WebSocket qui permet de recevoir les notifications.\par
+\pfeimage[height=0.47\textheight]{images/fig_p60_050.jpeg}
+\begin{center}
+\textbf{Figure 27 : Page de connexion de l'application mobile}
+\end{center}
+\subsection*{4.5.2 Page d'accueil :}
+La page d'accueil mobile reprend la même logique que celle du Dashboard web : les cartes récapitulatives, la chronologie des problèmes, le flux des attaques récentes. Elle n'inclut pas la carte de topologie, qui n'est pas adaptée à un écran de téléphone.\par
+\pfeimage[height=0.80\textheight]{images/fig_p61_051.jpeg}
+\begin{center}
+\textbf{Figure 28 : Page de surveillance de l'application mobile}
+\end{center}
+\subsection*{4.5.3 Menu latéral (Drawer) :}
+Une fois connecté, le menu latéral (qu'on ouvre en faisant glisser depuis le bord gauche) liste les équipements du cyber-range, regroupés par catégorie comme dans la sidebar du web. Chaque équipement a un point de couleur indiquant son état. Cliquer sur un équipement ouvre directement son panneau de détails.\par
+\pfeimage[height=0.80\textheight]{images/fig_p62_052.jpeg}
+\begin{center}
+\textbf{Figure 29 : Menu latéral dans l'application mobile}
+\end{center}
+\subsection*{4.5.4 Surveillance :}
+La page Surveillance présente les mêmes graphiques de comparaison entre équipements que sur le web : CPU, mémoire, débit, etc. La mise en page est adaptée à l'écran vertical du téléphone (graphiques empilés au lieu d'être en grille).\par
+\pfeimage[height=0.80\textheight]{images/fig_p63_053.jpeg}
+\begin{center}
+\textbf{Figure 30 : Page de surveillance dans l'application mobile}
+\end{center}
+\subsection*{4.5.5 \textbf{Sécurité :}}
+La page Sécurité de l’application mobile permet de consulter les alertes et l’historique des attaques détectées par le système. L’onglet Alertes affiche les différentes alertes liées à la supervision, par exemple lorsqu’un équipement devient inaccessible ou lorsqu’une règle de seuil est déclenchée. L’onglet Attaques regroupe l’historique des attaques détectées par le module de machine learning, avec les principales informations sur chaque incident.\par
+\pfeimage[height=0.80\textheight]{images/fig_p64_054.jpeg}
+\begin{center}
+\textbf{Figure 31 : Page de sécurité dans mobile}
+\end{center}
+\subsection*{4.5.6 Panneau latéral d'un équipement :}
+Comme sur le web, cliquer sur un équipement ouvre un panneau de détails. La version mobile reprend les onglets les plus utiles en consultation (Overview, KPI, History) dans une mise en page adaptée à l'écran.\par
+\pfeimage[height=0.80\textheight]{images/fig_p65_055.jpeg}
+\begin{center}
+\textbf{Figure 32 : Panneau latéral d'un équipement dans mobile}
+\end{center}
+\subsection*{4.6 Périmètre des attaques détectées :}
+Comme tout système de détection, cette plateforme possède certaines limites. Le système détecte correctement plusieurs attaques présentes dans le dataset d’entraînement, comme les scans de ports, les attaques par force brute, les SYN flood, UDP flood et certains cas de DDoS. Lorsqu’une attaque est détectée, la plateforme peut identifier l’équipement concerné, l’interface touchée et parfois l’adresse IP source. Grâce au modèle Isolation Forest, le système peut aussi signaler certains comportements anormaux qui ne correspondent à aucune attaque connue. Dans ce cas, l’alerte indique simplement une anomalie sans classification précise. Certaines attaques restent cependant hors du périmètre du projet, notamment les attaques APT, les attaques zero-day ou certaines attaques applicatives avancées comme l’injection SQL ou le cross-site scripting. Les attaques flood utilisant des IPs usurpées peuvent également être détectées, mais leur blocage ciblé reste difficile. Ces limites sont principalement liées au périmètre du projet, à la taille du dataset et à la granularité des métriques collectées.\par
+\clearpage
+\section*{\ub{CONCLUSION GÉNÉRALE :}}
+\addcontentsline{toc}{section}{CONCLUSION GÉNÉRALE :}
+Ce projet de fin d’études avait pour objectif de concevoir une plateforme de supervision adaptée aux besoins d’un opérateur télécom comme Mauritel, avec un accent particulier sur la supervision en temps réel et l’accès en mobilité. La plateforme développée durant le stage permet de superviser les équipements du réseau à travers un tableau de bord web et une application mobile capable de recevoir des notifications instantanées en cas d’incident. Le système a été testé sur une infrastructure simulée avec Containerlab regroupant plusieurs équipements répartis sur différentes zones réseau. Des fonctionnalités complémentaires ont également été ajoutées, notamment un module de détection d’attaques basé sur l’apprentissage automatique (Machine Learning) et un mécanisme de réponse automatisée.\par
+Ce stage a représenté une expérience enrichissante sur le plan technique et personnel. Il a permis de travailler avec plusieurs technologies différentes telles que Spring Boot, React, Flutter, Python, Docker et Containerlab, tout en découvrant des domaines nouveaux comme la conteneurisation réseau, le développement mobile et l’apprentissage automatique appliqué à la supervision.\par
+Parmi les limites identifiées, les notifications mobiles constituent un premier axe d’amélioration, notamment pour garantir leur réception même lorsque l’application est complètement fermée. Par ailleurs, le système a été validé dans un environnement simulé ; un déploiement en production nécessiterait des améliorations supplémentaires en termes de sécurité (HTTPS, gestion avancée des accès) et de scalabilité. Enfin, les modules de détection et de réponse automatisée pourraient être enrichis avec des modèles plus avancés et des jeux de données plus larges.\par
+Au-delà des résultats obtenus, ce projet a permis de mettre en œuvre une solution complète associant supervision en temps réel, mobilité, détection intelligente et réponse automatisée. Il constitue une base fonctionnelle et évolutive pouvant être enrichie afin de répondre aux exigences croissantes des infrastructures télécom modernes.\par
+\clearpage
+\chapter*{\ub{ANNEXE : MOI NUMÉRIQUE ET VALORISATION}}
+\addcontentsline{toc}{chapter}{ANNEXE : MOI NUMÉRIQUE ET VALORISATION}
+\ub{PROFESSIONNELLE}\par
+Dans le cadre de la valorisation de mon projet de fin d’études et de mes compétences techniques, j’ai préparé un portefeuille numérique regroupant mon profil professionnel, mes travaux techniques et mes auto- formations.\par
+\subsection*{1. Profil LinkedIn :}
+Mon profil LinkedIn présente mon parcours universitaire, mes compétences techniques ainsi que mon projet de fin d’études autour d’une plateforme Web et Mobile pour une infrastructure de télécommunication. Lien LinkedIn : https://mr.linkedin.com/in/sidi-hasnat-350a43396\par
+\subsection*{2. Profil GitHub:}
+Mon profil GitHub regroupe mes projets et travaux techniques. Le dépôt du projet PFE est organisé avec une structure claire et un fichier README.md présentant l’objectif du projet, les technologies utilisées, les fonctionnalités principales et les étapes d’exécution. Lien GitHub : \ub{\url{https://github.com/sidihasnat}}\par
+\subsection*{3. Profil Hugging face :}
+Profil utilisé pour valoriser mes expérimentations en Machine Learning et mes travaux liés à l’intelligence artificielle. https://huggingface.co/SidiHasnat\par
+\subsection*{4. Auto-formations:}
+Afin de renforcer mes compétences, j’ai suivi des auto-formations en ligne dans les domaines du monitoring, de l’observabilité, du développement logiciel et des pratiques DevOps. https://www.coursera.org/learn/monitoring-and-observability-for-development-and-devops\par
+\clearpage
+\section*{\ub{Références Bibliographiques:}}
+\addcontentsline{toc}{section}{Références Bibliographiques:}
+[1] Ponemon Institute, "Cost of Data Center Outages," Independent Research Report, 2011. [2] G. Booch, J. Rumbaugh et I. Jacobson, The Unified Modeling Language User Guide, 2ème édition, Addison- Wesley, 2005. [3] Containerlab, Documentation officielle. \ub{\url{https://containerlab.dev/}} (consulté en juin 2026) [4] Docker, Documentation officielle. \ub{\url{https://docs.docker.com/}} (consulté en juin 2026) [5] Spring, Spring Boot Reference Documentation. \ub{\url{https://docs.spring.io/spring-boot/}} (consulté en juin 2026) [6] Spring, Spring Security Reference Documentation. \ub{\url{https://docs.spring.io/spring-security/}} (consulté en juin 2026) [7] M. Jones, J. Bradley et N. Sakimura, « JSON Web Token (JWT) », RFC 7519, IETF, mai 2015. \ub{\url{https://datatracker.ietf.org/doc/html/rfc7519}} [8] Flask Documentation. \ub{\url{https://flask.palletsprojects.com/}} (consulté en juin 2026) [9] T. Chen et C. Guestrin, « XGBoost: A Scalable Tree Boosting System », dans les actes de la 22e conférence ACM SIGKDD, 2016, p. 785–794. [10] F. T. Liu, K. M. Ting et Z.-H. Zhou, « Isolation Forest », dans les actes de la 8e conférence IEEE ICDM, 2008, p. 413–422. [11] pandas, Documentation officielle. \ub{\url{https://pandas.pydata.org/docs/}} (consulté en juin 2026) [12] Oracle, MySQL 8.0 Reference Manual. \ub{\url{https://dev.mysql.com/doc/}} (consulté en juin 2026) [13] React, Documentation officielle. \ub{\url{https://react.dev/}} (consulté en juin 2026) [14] Nginx, Documentation officielle. \ub{\url{https://nginx.org/en/docs/}} (consulté en juin 2026) [15] Flutter, Documentation officielle. \ub{\url{https://docs.flutter.dev/}} (consulté en juin 2026) [16] Project Jupyter, Documentation officielle. \ub{\url{https://docs.jupyter.org/}} (consulté en juin 2026)\par
+
+\end{document}

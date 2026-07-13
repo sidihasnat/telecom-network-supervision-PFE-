@@ -1,0 +1,88 @@
+\documentclass[10.5pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[a4paper,top=1.25cm,bottom=1.2cm,left=1.65cm,right=1.65cm]{geometry}
+\usepackage{lmodern}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{ragged2e}
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\definecolor{accent}{HTML}{17365D}
+\definecolor{textgray}{HTML}{30343B}
+\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+\urlstyle{same}
+
+\newcommand{\cvsection}[1]{%
+  \vspace{0.46cm}%
+  {\large\bfseries\color{accent} #1}\par
+  \vspace{0.08cm}%
+  {\color{accent}\rule{\textwidth}{0.75pt}}\par
+  \vspace{0.16cm}%
+}
+
+\newcommand{\project}[2]{%
+  \begin{minipage}[t]{0.025\textwidth}\color{accent}\large$\bullet$\end{minipage}%
+  \begin{minipage}[t]{0.955\textwidth}
+    {\bfseries #1}\par
+    \vspace{0.03cm}#2
+  \end{minipage}\par\vspace{0.11cm}
+}
+
+\newcommand{\skill}[2]{%
+  \begin{minipage}[t]{0.025\textwidth}\color{accent}\large$\bullet$\end{minipage}%
+  \begin{minipage}[t]{0.955\textwidth}
+    {\bfseries #1} #2
+  \end{minipage}\par\vspace{0.07cm}
+}
+
+\begin{document}
+\color{textgray}
+
+\begin{center}
+  {\fontsize{26}{29}\selectfont\bfseries\color{accent} CV}\par
+  \vspace{0.22cm}
+  {\fontsize{16}{19}\selectfont\bfseries Sidi mohamed lemin ahmed henoun}\par
+  \vspace{0.18cm}
+  {\small Date de naissance: 03/12/2004 \quad $\vert$ \quad Nouakchott/Mauritanie \quad $\vert$ \quad +22222552125}\par
+  \vspace{0.07cm}
+  {\small \href{mailto:sidihasnat3@gmail.com}{sidihasnat3@gmail.com} \quad $\vert$ \quad
+  \href{https://github.com/sidihasnat}{github.com/sidihasnat}}\par
+  \vspace{0.07cm}
+  {\small \href{https://mr.linkedin.com/in/sidi-hasnat-350a43396}{mr.linkedin.com/in/sidi-hasnat-350a43396}}\par
+\end{center}
+
+\cvsection{FORMATION}
+{\bfseries 2025-2026 : Licence Développement Administration Internet \& Intranet (Obtenue)}\par
+\vspace{0.08cm}
+Faculté des Sciences et Techniques - Université de Nouakchott\par
+\vspace{0.08cm}
+{\bfseries 2022-2023 Obtention de baccalauréat série C, lycée de ksar/ Nouakchott-Mauritanie.}
+
+\cvsection{Projet académique}
+\project{Application de vente de vêtements}{Developpement d’une application mobile avec Flutter FLask et Mysql}
+\project{Gestion de pharmacie (site web dynamique)}{Réalisation d’une application web avec Html, Css, JavaScript, Php}
+\project{Projet Unix/Linux}{Installation et configuration de la plateforme moodle}
+\project{Projet de Fin d'Études (PFE)}{Mise en place d’une plateforme de supervision avec accès Web et Mobile pour une infrastructure de Télécommunication}
+
+\cvsection{COMPETENCES TECHNIQUES}
+\skill{Language de programmation:}{C, Java, Python, PHP, Dart}
+\skill{Frameworks / outils :}{Flask, Spring Boot, Flutter}
+\skill{Developpement Web:}{Html, Css, JavaScript Base de donnée: Mysql .}
+\skill{Système :}{Unix/Linux,Windows}
+\skill{Reseaux :}{adressage IP, routage statique et dynamique (RIP, OSPF),firewalls.}
+
+\cvsection{LANGUES}
+\begin{itemize}[leftmargin=0.65cm,itemsep=0.06cm,topsep=0.03cm,label=\textcolor{accent}{$\bullet$}]
+  \item Arabe : langue maternelle.
+  \item Français : niveau bien.
+  \item Anglais : niveau bien.
+\end{itemize}
+
+\end{document}
